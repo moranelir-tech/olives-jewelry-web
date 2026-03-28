@@ -3,3 +3,5 @@ deployment:
   tasks:
     - export DEPLOYPATH=/home/$USER/olives-jewelry/
     - /bin/cp -r . $DEPLOYPATH
+    - export PATH=/home/$USER/nodevenv/olives-jewelry/20/bin:$PATH
+    - cd $DEPLOYPATH && npm install --production
