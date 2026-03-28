@@ -2,6 +2,8 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/$USER/olives-jewelry/
+    - find $DEPLOYPATH -maxdepth 1 -name "*.html" -delete
+    - find $DEPLOYPATH -maxdepth 1 -name "*.css" -delete
     - /bin/cp -r . $DEPLOYPATH
     - export PATH=/home/$USER/nodevenv/olives-jewelry/20/bin:$PATH
     - cd $DEPLOYPATH && npm install --production
