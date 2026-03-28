@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Olives Jewelry | סל קניות</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Hebrew:wght@300;400;600&family=Heebo:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .cart-page { max-width: 860px; margin: 0 auto; padding: var(--s12) var(--s10) var(--s20); }
+    .cart-empty { text-align: center; padding: 6rem 2rem; }
+    .cart-empty h2 { font-family: var(--serif); font-weight: 300; font-size: 1.8rem; margin-bottom: 1rem; color: var(--text); }
+    .cart-empty p  { font-size: 0.9rem; color: var(--text); opacity: 0.5; margin-bottom: 2rem; }
+
+    .cart-items { display: flex; flex-direction: column; gap: 0; }
+    .cart-item {
+      display: grid; grid-template-columns: 80px 1fr auto;
+      gap: var(--s6); align-items: center;
+      padding: var(--s6) 0; border-bottom: 1px solid var(--border);
+    }
+    .cart-item-img {
+      width: 80px; height: 80px; object-fit: cover;
+      background: #EDE5DE;
+    }
+    .cart-item-img-placeholder { width: 80px; height: 80px; background: #EDE5DE; }
+    .cart-item-name { font-family: var(--serif); font-size: 1rem; font-weight: 400; color: #1A1A1A; margin-bottom: 0.2rem; }
+    .cart-item-engraving { font-size: 0.75rem; color: var(--olive); opacity: 0.8; margin-bottom: 0.15rem; }
+    .cart-item-cat { font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--olive); opacity: 0.55; }
+    .cart-item-price { font-family: var(--serif); font-size: 1.1rem; color: var(--olive); white-space: nowrap; }
+    .cart-item-remove {
+      display: block; font-size: 0.65rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--text); opacity: 0.35;
+      background: none; border: none; cursor: pointer;
+      margin-top: 0.4rem; transition: opacity 0.2s, color 0.2s;
+    }
+    .cart-item-remove:hover { opacity: 1; color: #C0392B; }
+
+    .cart-summary {
+      margin-top: var(--s10); border-top: 2px solid var(--olive);
+      padding-top: var(--s8);
+    }
+    .summary-row {
+      display: flex; justify-content: space-between;
+      font-size: 0.85rem; padding: 0.3rem 0; color: var(--text); opacity: 0.7;
+    }
+    .summary-row.total {
+      font-family: var(--serif); font-size: 1.4rem;
+      font-weight: 500; color: #1A1A1A; opacity: 1;
+      padding-top: var(--s4); margin-top: var(--s3);
+      border-top: 1px solid var(--border);
+    }
+    .cart-actions { display: flex; gap: var(--s4); margin-top: var(--s8); flex-wrap: wrap; }
+    .btn-checkout {
+      flex: 1; background: var(--olive); color: var(--cream-text);
+      padding: 0.95rem 2rem; font-size: 0.85rem;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      border: none; cursor: pointer; transition: opacity 0.2s;
+      font-family: var(--sans);
+    }
+    .btn-checkout:hover { opacity: 0.82; }
+    .btn-continue {
+      padding: 0.95rem 1.8rem; font-size: 0.78rem;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--text); cursor: pointer; transition: border-color 0.2s, color 0.2s;
+      font-family: var(--sans);
+    }
+    .btn-continue:hover { border-color: var(--olive); color: var(--olive); }
+    .free-shipping-note {
+      font-size: 0.75rem; color: var(--olive); opacity: 0.7;
+      text-align: center; margin-top: var(--s4);
+      padding: 0.5rem; border: 1px solid rgba(59,64,42,0.2);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="promo-bar">
+    ✦ &nbsp; מבצע מיוחד — <strong>2 תכשיטים ב-350 ₪ בלבד</strong> &nbsp; ✦
+  </div>
+
+  <header class="main-header">
+    <div class="header-content">
+      <a href="index.html" class="logo">OLIVES JEWELRY</a>
+      <nav class="main-nav" aria-label="ניווט ראשי">
+        <ul class="nav-list">
+          <li class="nav-item"><a href="index.html">דף בית</a></li>
+          <li class="nav-item">
+            <a href="#">תכשיטים חריטה <span class="nav-arrow">▾</span></a>
+            <div class="dropdown mega">
+              <p class="mega-section-title">קטגוריות</p>
+              <div class="mega-cats">
+                <a href="shop.html?cat=צמידי חריטה">צמידי חריטה</a>
+                <a href="shop.html?cat=שרשראות חריטה">שרשראות חריטה</a>
+                <a href="shop.html?cat=טבעות חריטה">טבעות חריטה</a>
+              </div>
+            </div>
+          </li>
+          <li class="nav-item">
+            <a href="#">תכשיטים ללא חריטה <span class="nav-arrow">▾</span></a>
+            <div class="dropdown">
+              <a href="shop.html?cat=צמידים">צמידים</a>
+              <a href="shop.html?cat=שרשראות">שרשראות</a>
+              <a href="shop.html?cat=עגילים">עגילים</a>
+            </div>
+          </li>
+          <li class="nav-item"><a href="shop.html">חנות</a></li>
+          <li class="nav-item">
+            <a href="cart.html" class="cart-btn active" aria-label="עגלת קניות">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M6 2 L3 6 v14 a2 2 0 0 0 2 2 h14 a2 2 0 0 0 2-2 V6 l-3-4 z"/>
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <path d="M16 10 a4 4 0 0 1-8 0"/>
+              </svg>
+              <span class="cart-count" id="cart-count">0</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <div class="user-auth">
+        <a href="#">כניסה</a>
+        <a href="#" class="btn-signup">הרשמה</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="marquee-wrapper" aria-hidden="true">
+    <div class="marquee-track">
+      <span class="marquee-item"><span class="marquee-dot"></span>משלוח חינם בקניה מעל 250 ₪</span>
+      <span class="marquee-item"><span class="marquee-dot"></span>עמידות במים</span>
+      <span class="marquee-item"><span class="marquee-dot"></span>משלוח מהיר 2-4 ימים</span>
+      <span class="marquee-item"><span class="marquee-dot"></span>חריטה אישית על כל מוצר</span>
+      <span class="marquee-item"><span class="marquee-dot"></span>משלוח חינם בקניה מעל 250 ₪</span>
+      <span class="marquee-item"><span class="marquee-dot"></span>עמידות במים</span>
+      <span class="marquee-item"><span class="marquee-dot"></span>משלוח מהיר 2-4 ימים</span>
+      <span class="marquee-item"><span class="marquee-dot"></span>חריטה אישית על כל מוצר</span>
+    </div>
+  </div>
+
+  <main>
+    <div class="cart-page">
+      <span class="section-label">סל קניות</span>
+      <h1 class="section-title" style="margin-bottom:var(--s10)" id="cart-title">הסל שלי</h1>
+      <div id="cart-content"></div>
+    </div>
+  </main>
+
+  <footer class="main-footer">
+    <div class="footer-inner">
+      <div class="footer-col"><h5>חשוב</h5><ul>
+        <li><a href="#">מדיניות פרטיות</a></li><li><a href="#">תנאי שימוש</a></li>
+        <li><a href="#">מדיניות החזרות</a></li><li><a href="#">שאלות נפוצות</a></li>
+      </ul></div>
+      <div class="footer-col"><h5>קישורים</h5><ul>
+        <li><a href="index.html">בית</a></li><li><a href="shop.html">חנות</a></li>
+      </ul></div>
+      <div class="footer-col"><h5>צור קשר</h5><ul>
+        <li><a href="#">WhatsApp</a></li><li><a href="#">אינסטגרם</a></li>
+      </ul></div>
+      <div class="footer-col"><h5>פרטי התקשרות</h5><ul>
+        <li><a href="#">info@olivesjewelry.com</a></li>
+        <li><a href="#">050-000-0000</a></li>
+      </ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-brand">OLIVES JEWELRY</span>
+      <span class="footer-copy">© 2026 Olives Jewelry. All rights reserved.</span>
+    </div>
+  </footer>
+
+<script>
+const cart = JSON.parse(localStorage.getItem('olives_cart') || '[]');
+document.getElementById('cart-count').textContent = cart.length;
+
+function removeItem(idx) {
+  cart.splice(idx, 1);
+  localStorage.setItem('olives_cart', JSON.stringify(cart));
+  renderCart();
+  document.querySelectorAll('.cart-count').forEach(el => el.textContent = cart.length);
+}
+
+function renderCart() {
+  const el = document.getElementById('cart-content');
+
+  if (!cart.length) {
+    el.innerHTML = `
+      <div class="cart-empty">
+        <h2>הסל ריק</h2>
+        <p>עדיין לא הוספת פריטים לסל הקניות.</p>
+        <a href="shop.html" class="btn-add-cart" style="display:inline-block;text-decoration:none;padding:0.9rem 2.5rem">לחנות</a>
+      </div>`;
+    return;
+  }
+
+  const total = cart.reduce((s, i) => s + (i.price || 0), 0);
+  const freeShipping = total >= 250;
+
+  let html = `<div class="cart-items">`;
+  cart.forEach((item, idx) => {
+    const eng = item.engraving;
+    let engLines = '';
+    if (eng) {
+      if (eng.front_text) engLines += `<div class="cart-item-engraving">✏️ חריטה: "${eng.front_text}"${eng.front_font ? ` · ${eng.front_font}` : ''}</div>`;
+      if (eng.back_text)  engLines += `<div class="cart-item-engraving">✏️ אחורי: "${eng.back_text}"</div>`;
+      if (eng.names && eng.names.length) engLines += `<div class="cart-item-engraving">👥 שמות: ${eng.names.join(', ')}</div>`;
+    }
+    html += `
+    <div class="cart-item">
+      ${item.image
+        ? `<img src="${item.image}" alt="${item.name}" class="cart-item-img">`
+        : `<div class="cart-item-img-placeholder"></div>`}
+      <div>
+        <div class="cart-item-name">${item.name}</div>
+        ${engLines}
+        <button class="cart-item-remove" onclick="removeItem(${idx})">הסר מהסל</button>
+      </div>
+      <div style="text-align:left">
+        <div class="cart-item-price">${(item.price||0).toLocaleString('he-IL')} ₪</div>
+      </div>
+    </div>`;
+  });
+  html += `</div>`;
+
+  html += `<div class="cart-summary">
+    <div class="summary-row"><span>סכום ביניים</span><span>${total.toLocaleString('he-IL')} ₪</span></div>
+    <div class="summary-row"><span>משלוח</span><span>${freeShipping ? 'חינם' : '29 ₪'}</span></div>
+    <div class="summary-row total"><span>סה"כ לתשלום</span><span>${(total + (freeShipping ? 0 : 29)).toLocaleString('he-IL')} ₪</span></div>
+  </div>`;
+
+  if (!freeShipping) {
+    html += `<div class="free-shipping-note">נותרו עוד ${(250 - total).toLocaleString('he-IL')} ₪ לקבלת משלוח חינם</div>`;
+  }
+
+  html += `<div class="cart-actions">
+    <button class="btn-continue" onclick="location.href='shop.html'">המשך קניות</button>
+    <button class="btn-checkout" onclick="alert('מעבר לתשלום — בקרוב!')">מעבר לתשלום</button>
+  </div>`;
+
+  el.innerHTML = html;
+}
+
+renderCart();
+</script>
+</body>
+</html>

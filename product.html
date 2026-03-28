@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Olives Jewelry | מוצר</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Hebrew:wght@300;400;600&family=Heebo:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ════════════════════════════════════════════════
+       ENGRAVING — Inline Flow
+    ════════════════════════════════════════════════ */
+
+    /* Section header row */
+    .eng-section { margin-top: 0; }
+    .eng-section-head {
+      display: flex; align-items: baseline; justify-content: space-between;
+      margin-bottom: var(--s6);
+    }
+    .eng-price-note {
+      font-size: 0.72rem; letter-spacing: 0.06em;
+      color: var(--accent);
+    }
+
+    /* Side tabs (קדמי / אחורי) */
+    .eng-side-tabs {
+      display: flex; gap: var(--s8);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: var(--s8);
+    }
+    .eng-side-tab {
+      font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase;
+      color: #2A2520; padding-bottom: var(--s3); margin-bottom: -1px;
+      border-bottom: 1px solid transparent;
+      cursor: pointer; background: none; border-top: none;
+      border-right: none; border-left: none;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .eng-side-tab.active { color: var(--olive); border-bottom-color: var(--olive); font-weight: 500; }
+
+    /* Type selector */
+    .eng-type-row { display: flex; gap: var(--s6); margin-bottom: var(--s6); }
+    .eng-type-btn {
+      font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: #2A2520; background: none; border: none; padding: 0;
+      padding-bottom: 2px; border-bottom: 1px solid transparent;
+      cursor: pointer; transition: color 0.2s, border-color 0.2s;
+    }
+    .eng-type-btn.active { color: var(--olive); border-bottom-color: var(--olive); font-weight: 500; }
+
+    /* Font selector */
+    .eng-font-label {
+      font-size: 0.62rem; letter-spacing: 0.24em; text-transform: uppercase;
+      color: var(--olive); margin-bottom: var(--s3);
+    }
+    .font-selector { display: flex; gap: var(--s6); flex-wrap: wrap; margin-bottom: var(--s6); }
+    .font-opt {
+      font-size: 0.85rem; cursor: pointer; color: #2A2520;
+      background: none; border: none; padding: 0;
+      padding-bottom: 1px; border-bottom: 1px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .font-opt.active { color: var(--olive); border-bottom-color: var(--olive); font-weight: 500; }
+
+    /* Required label */
+    .eng-required-label {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 0.3rem;
+    }
+    .eng-required-tag {
+      font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--accent); background: rgba(184,159,143,0.12);
+      padding: 0.15rem 0.5rem; border-radius: 2px;
+    }
+
+    /* Text input */
+    .eng-text-input {
+      width: 100%; padding: 0.55rem 0;
+      border: none; border-bottom: 2px solid var(--border);
+      border-radius: 0; background: transparent;
+      font-family: var(--sans); font-size: 0.92rem;
+      direction: rtl; color: var(--text);
+      transition: border-color 0.2s; margin-bottom: 0.3rem;
+    }
+    .eng-text-input::placeholder { color: #7A7068; }
+    .eng-text-input:focus { outline: none; border-bottom-color: var(--olive); }
+    .eng-text-input.error { border-bottom-color: #C0392B; }
+    @keyframes shake {
+      0%,100%{transform:translateX(0)} 20%{transform:translateX(-5px)} 60%{transform:translateX(5px)}
+    }
+    .eng-text-input.shake { animation: shake 0.35s ease; }
+    .eng-error-msg {
+      font-size: 0.68rem; color: #C0392B; margin-bottom: var(--s4);
+      display: none;
+    }
+    .eng-char-count {
+      font-size: 0.68rem; color: #2A2520;
+      text-align: left; margin-bottom: var(--s6);
+    }
+
+    /* Image upload */
+    .eng-img-upload {
+      border: 1px solid var(--border); padding: 2rem;
+      text-align: center; cursor: pointer; margin-bottom: var(--s6);
+      transition: border-color 0.2s;
+    }
+    .eng-img-upload:hover { border-color: var(--accent); }
+    .eng-img-upload input { display: none; }
+    .eng-img-upload-label { font-size: 0.78rem; color: #2A2520; line-height: 1.9; }
+    .eng-img-preview { max-width: 100%; max-height: 140px; display: none; margin: 0 auto; }
+
+    /* Multi-names */
+    .names-list { display: flex; flex-direction: column; gap: var(--s4); margin-bottom: var(--s4); }
+    .name-input-row { display: flex; align-items: center; gap: var(--s6); }
+    .name-input-row label {
+      font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--olive); white-space: nowrap; min-width: 50px;
+    }
+    .name-input-row input {
+      flex: 1; padding: 0.4rem 0;
+      border: none; border-bottom: 2px solid var(--border);
+      background: transparent; font-size: 0.88rem;
+      direction: rtl; color: var(--text);
+      transition: border-color 0.2s;
+    }
+    .name-input-row input::placeholder { color: #7A7068; }
+    .name-input-row input:focus { outline: none; border-bottom-color: var(--olive); }
+    .add-name-btn {
+      font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--olive); cursor: pointer;
+      background: none; border: none; padding: 0;
+      margin-bottom: var(--s6); transition: opacity 0.2s;
+    }
+    .add-name-btn:hover { opacity: 0.7; }
+
+    /* Price breakdown */
+    .price-summary { margin-top: var(--s2); }
+    .price-row {
+      display: flex; justify-content: space-between;
+      font-size: 0.78rem; padding: 0.15rem 0;
+      color: var(--text); opacity: 0.7;
+    }
+    .price-row.total {
+      opacity: 1; font-size: 0.85rem;
+      padding-top: var(--s3); margin-top: var(--s2);
+      border-top: 1px solid var(--border);
+    }
+
+    /* Not found */
+    .not-found { text-align: center; padding: 6rem 2rem; color: var(--text); opacity: 0.5; }
+    .not-found h2 { font-family: var(--serif); font-weight: 300; font-size: 1.5rem; margin-bottom: 1rem; }
+
+    /* Loading */
+    .product-loading { min-height: 60vh; display: flex; align-items: center; justify-content: center; }
+    .product-loading .spinner {
+      width: 32px; height: 32px;
+      border: 1px solid var(--border); border-top-color: var(--olive);
+      border-radius: 50%; animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <!-- ─── פס מבצע ───────────────────────────────────────────── -->
+  <div class="promo-bar">
+    ✦ &nbsp; מבצע מיוחד — <strong>2 תכשיטים ב-350 ₪ בלבד</strong> &nbsp; ✦
+  </div>
+
+  <!-- ─── HEADER ─────────────────────────────────────────────── -->
+  <header class="main-header">
+    <div class="header-content">
+      <a href="index.html" class="logo">OLIVES JEWELRY</a>
+      <nav class="main-nav" aria-label="ניווט ראשי">
+        <ul class="nav-list">
+          <li class="nav-item"><a href="index.html">דף בית</a></li>
+          <li class="nav-item">
+            <a href="#">תכשיטים חריטה <span class="nav-arrow">▾</span></a>
+            <div class="dropdown mega">
+              <p class="mega-section-title">קטגוריות</p>
+              <div class="mega-cats">
+                <a href="shop.html?cat=צמידי חריטה">צמידי חריטה</a>
+                <a href="shop.html?cat=שרשראות חריטה">שרשראות חריטה</a>
+                <a href="shop.html?cat=טבעות חריטה">טבעות חריטה</a>
+              </div>
+            </div>
+          </li>
+          <li class="nav-item">
+            <a href="#">תכשיטים ללא חריטה <span class="nav-arrow">▾</span></a>
+            <div class="dropdown">
+              <a href="shop.html?cat=צמידים">צמידים</a>
+              <a href="shop.html?cat=שרשראות">שרשראות</a>
+              <a href="shop.html?cat=עגילים">עגילים</a>
+            </div>
+          </li>
+          <li class="nav-item"><a href="shop.html">חנות</a></li>
+          <li class="nav-item">
+            <a href="cart.html" class="cart-btn" aria-label="עגלת קניות">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M6 2 L3 6 v14 a2 2 0 0 0 2 2 h14 a2 2 0 0 0 2-2 V6 l-3-4 z"/>
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <path d="M16 10 a4 4 0 0 1-8 0"/>
+              </svg>
+              <span class="cart-count">0</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <div class="user-auth">
+        <a href="#">כניסה</a>
+        <a href="#" class="btn-signup">הרשמה</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── לולאה אינסופית ─────────────────────────────────────── -->
+  <div class="marquee-wrapper" aria-hidden="true">
+    <div class="marquee-track">
+      <span class="marquee-item"><span class="marquee-dot"></span>משלוח חינם בקניה מעל 250 ₪</span>
+      <span class="marquee-item"><span class="marquee-dot"></span>עמידות במים</span>
+      <span class="marquee-item"><span class="marquee-dot"></span>משלוח מהיר 2-4 ימים</span>
+      <span class="marquee-item"><span class="marquee-dot"></span>חריטה אישית על כל מוצר</span>
+      <span class="marquee-item"><span class="marquee-dot"></span>משלוח חינם בקניה מעל 250 ₪</span>
+      <span class="marquee-item"><span class="marquee-dot"></span>עמידות במים</span>
+      <span class="marquee-item"><span class="marquee-dot"></span>משלוח מהיר 2-4 ימים</span>
+      <span class="marquee-item"><span class="marquee-dot"></span>חריטה אישית על כל מוצר</span>
+    </div>
+  </div>
+
+  <main id="main-content">
+    <div class="product-loading"><div class="spinner"></div></div>
+  </main>
+
+  <!-- ─── FOOTER ────────────────────────────────────────────── -->
+  <footer class="main-footer">
+    <div class="footer-inner">
+      <div class="footer-col"><h5>חשוב</h5><ul>
+        <li><a href="#">מדיניות פרטיות</a></li><li><a href="#">תנאי שימוש</a></li>
+        <li><a href="#">מדיניות החזרות</a></li><li><a href="#">שאלות נפוצות</a></li>
+      </ul></div>
+      <div class="footer-col"><h5>קישורים</h5><ul>
+        <li><a href="index.html">בית</a></li><li><a href="shop.html">חנות</a></li>
+      </ul></div>
+      <div class="footer-col"><h5>צור קשר</h5><ul>
+        <li><a href="#">WhatsApp</a></li><li><a href="#">אינסטגרם</a></li>
+        <li><a href="#">פייסבוק</a></li><li><a href="#">TikTok</a></li>
+      </ul></div>
+      <div class="footer-col"><h5>פרטי התקשרות</h5><ul>
+        <li><a href="#">info@olivesjewelry.com</a></li>
+        <li><a href="#">050-000-0000</a></li>
+        <li><a href="#">ת"א, ישראל</a></li>
+        <li><a href="#">א'–ה' 10:00–18:00</a></li>
+      </ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-brand">OLIVES JEWELRY</span>
+      <span class="footer-copy">© 2026 Olives Jewelry. All rights reserved.</span>
+    </div>
+  </footer>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════
+let product   = null;
+let basePrice = 0;
+
+// Engraving state
+const state = {
+  front: { type: null, text: '', font: null, imageFile: null },
+  back:  { enabled: false, type: null, text: '', imageFile: null },
+  names: []   // [{ text }]
+};
+
+// ══════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════
+(async function init() {
+  const id = new URLSearchParams(location.search).get('id');
+  if (!id) { renderNotFound(); return; }
+  let res;
+  try {
+    res = await fetch(`/api/products/${id}`);
+  } catch (e) {
+    console.error('שגיאת רשת:', e);
+    renderNotFound(); return;
+  }
+  if (!res.ok) {
+    console.error('API החזיר שגיאה:', res.status, await res.text().catch(() => ''));
+    renderNotFound(); return;
+  }
+  product   = await res.json();
+  basePrice = product.price;
+  document.title = `Olives Jewelry | ${product.name}`;
+  try {
+    renderProduct();
+  } catch (e) {
+    console.error('שגיאה בעיבוד המוצר:', e);
+  }
+})();
+
+// ══════════════════════════════════════════════════════════
+// RENDER PRODUCT PAGE
+// ══════════════════════════════════════════════════════════
+function renderProduct() {
+  const es = product.engraving_settings || {};
+
+  // Normalise old / new format
+  const front = es.front || (es.max_chars ? {
+    types: ['text'], max_chars: es.max_chars,
+    fonts: es.fonts || [], price_addition: es.price_addition || 0
+  } : { types: [], max_chars: 20, fonts: [], price_addition: 0 });
+
+  const back       = es.back        || { enabled: false };
+  const multiNames = es.multi_names || { enabled: false };
+
+  const catLabel = product.category || '';
+  const isEngravable = product.is_engravable;
+
+  document.getElementById('main-content').innerHTML = `
+
+    <!-- BREADCRUMB -->
+    <nav class="breadcrumb" aria-label="breadcrumb">
+      <a href="index.html">בית</a><span>/</span>
+      <a href="shop.html">חנות</a><span>/</span>
+      <a href="shop.html?cat=${encodeURIComponent(catLabel)}">${catLabel}</a><span>/</span>
+      <span style="opacity:.65">${product.name}</span>
+    </nav>
+
+    <!-- PRODUCT LAYOUT -->
+    <div class="product-layout">
+
+      <!-- ─ Images ─ -->
+      <div class="product-images">
+        <div class="product-main-img" id="main-img-wrap">
+          ${product.image_url
+            ? `<img src="${product.image_url}" alt="${product.name}"
+                    style="width:100%;height:100%;object-fit:cover;"
+                    onerror="this.parentElement.innerHTML='<span>אין תמונה</span>'">`
+            : `<span>אין תמונה</span>`}
+        </div>
+      </div>
+
+      <!-- ─ Info ─ -->
+      <div class="product-info">
+        <span class="section-label">${catLabel}</span>
+        <h1 class="product-name">${product.name}</h1>
+        <p class="product-price" id="display-price">${basePrice.toLocaleString('he-IL')} ₪</p>
+        <p class="product-desc">${product.description || ''}</p>
+
+        <!-- Product highlights — dynamic from admin -->
+        <div class="product-highlights">
+          ${product.details_material ? `<div class="product-highlight">
+            <span class="section-label">חומר</span>
+            <span class="highlight-val">${product.details_material}</span>
+          </div>` : ''}
+          ${product.details_waterproof ? `<div class="product-highlight">
+            <span class="section-label">עמידות</span>
+            <span class="highlight-val">${product.details_waterproof}</span>
+          </div>` : ''}
+          ${product.details_shipping ? `<div class="product-highlight">
+            <span class="section-label">משלוח</span>
+            <span class="highlight-val">${product.details_shipping}</span>
+          </div>` : ''}
+          ${isEngravable && product.details_engraving ? `<div class="product-highlight">
+            <span class="section-label">חריטה</span>
+            <span class="highlight-val">${product.details_engraving}</span>
+          </div>` : ''}
+        </div>
+
+        <hr class="product-divider" />
+
+        ${isEngravable ? buildEngravingUI(front, back, multiNames) : ''}
+
+        ${isEngravable ? '<hr class="product-divider" />' : ''}
+
+        <!-- Price breakdown — shown only when engraving added -->
+        ${isEngravable ? `
+        <div class="price-summary" id="price-summary">
+          <div class="price-row" id="ps-front-row" style="display:none"><span id="ps-front-label">חריטה קדמית</span><span id="ps-front-val"></span></div>
+          <div class="price-row" id="ps-back-row"  style="display:none"><span>חריטה אחורית</span><span id="ps-back-val"></span></div>
+          <div class="price-row" id="ps-names-row" style="display:none"><span id="ps-names-label">שמות</span><span id="ps-names-val"></span></div>
+          <div class="price-row total" id="ps-total-row" style="display:none"><span>סה"כ</span><span id="ps-total"></span></div>
+        </div>` : ''}
+
+        <!-- CTA -->
+        <button class="btn-add-cart" type="button" onclick="addToCart()" style="margin-top:1.25rem">הוסף לסל</button>
+        <a href="#" class="product-wa">לשאלות — צרו קשר ב-WhatsApp</a>
+      </div>
+    </div>
+
+    <!-- DETAILS STRIP — dynamic -->
+    <div class="product-details-strip">
+      ${product.details_material ? `<div class="detail-item">
+        <span class="section-label">חומרים</span>
+        <h4>${product.details_material}</h4>
+        <p>כל הפריטים עשויים ממתכות איכותיות עמידות לאורך זמן.</p>
+      </div>` : ''}
+      ${isEngravable && product.details_engraving ? `<div class="detail-item">
+        <span class="section-label">חריטה</span>
+        <h4>${product.details_engraving}</h4>
+        <p>כל חריטה מבוצעת ידנית בדיוק מרבי לפי הוראות הלקוח.</p>
+      </div>` : ''}
+      ${product.details_waterproof ? `<div class="detail-item">
+        <span class="section-label">עמידות</span>
+        <h4>${product.details_waterproof}</h4>
+        <p>עמיד לאורך זמן — מושלם לשימוש יומיומי.</p>
+      </div>` : ''}
+      ${product.details_shipping ? `<div class="detail-item">
+        <span class="section-label">משלוח</span>
+        <h4>${product.details_shipping}</h4>
+        <p>אריזת מתנה מהודרת כלולה בכל הזמנה ללא עלות נוספת.</p>
+      </div>` : ''}
+    </div>
+  `;
+
+  // Attach events after render
+  if (isEngravable) attachEngravingEvents(front, back, multiNames);
+}
+
+// ══════════════════════════════════════════════════════════
+// BUILD ENGRAVING UI HTML  —  Inline Flow
+// ══════════════════════════════════════════════════════════
+function buildEngravingUI(front, back, multiNames) {
+  const hasFront      = front.types && front.types.length > 0;
+  const hasBack       = back.enabled;
+  const hasMultiNames = multiNames.enabled;
+
+  if (!hasFront && !hasBack && !hasMultiNames) return '';
+
+  const priceNote = front.price_addition > 0
+    ? `+ ${front.price_addition} ₪ לחריטה`
+    : 'חריטה ללא תוספת';
+
+  let html = `<div class="eng-section">
+    <div class="eng-section-head">
+      <span class="section-label" style="margin-bottom:0">חריטה אישית</span>
+      <span class="eng-price-note">${priceNote}</span>
+    </div>`;
+
+  // ── Side tabs (only if back side exists) ──
+  if (hasBack) {
+    html += `<div class="eng-side-tabs">
+      <button class="eng-side-tab active" id="tab-front" onclick="switchSide('front')">קדמי</button>
+      <button class="eng-side-tab" id="tab-back" onclick="switchSide('back')">אחורי${back.price_addition > 0 ? ` · +${back.price_addition} ₪` : ''}</button>
+    </div>`;
+  }
+
+  // ── Front panel ──
+  html += `<div id="panel-front">`;
+  html += buildSidePanel('front', front);
+  html += `</div>`;
+
+  // ── Back panel ──
+  if (hasBack) {
+    html += `<div id="panel-back" style="display:none">`;
+    html += buildSidePanel('back', back);
+    html += `</div>`;
+  }
+
+  // ── Multi-names panel ──
+  if (hasMultiNames) {
+    html += `<div id="panel-names" style="padding-top:var(--s8);border-top:1px solid var(--border)">
+      <div class="eng-section-head" style="margin-bottom:var(--s6)">
+        <span class="section-label" style="margin-bottom:0">${multiNames.slot_label || 'שמות'} לחריטה</span>
+        ${multiNames.price_per_name > 0
+          ? `<span class="eng-price-note">+ ${multiNames.price_per_name} ₪ לכל שם</span>`
+          : ''}
+      </div>
+      <div class="names-list" id="names-list"></div>
+      <button class="add-name-btn" id="add-name-btn" onclick="addNameSlot()">
+        + הוסף ${multiNames.slot_label || 'שם'}
+      </button>
+    </div>`;
+  }
+
+  html += `</div>`;
+  return html;
+}
+
+function buildSidePanel(side, cfg) {
+  const types    = cfg.types || [];
+  const hasText  = types.includes('text');
+  const hasImage = types.includes('image');
+  let html = '';
+
+  // Type selector — only when both options exist
+  if (hasText && hasImage) {
+    html += `<div class="eng-type-row">
+      <button class="eng-type-btn active" id="type-text-${side}" onclick="setType('${side}','text')">טקסט</button>
+      <button class="eng-type-btn"        id="type-img-${side}"  onclick="setType('${side}','image')">תמונה</button>
+    </div>`;
+  }
+
+  // Text fields
+  html += `<div id="text-fields-${side}" ${hasText ? '' : 'style="display:none"'}>
+    ${(cfg.fonts && cfg.fonts.length > 1) ? `
+    <div class="eng-font-label">סגנון גופן</div>
+    <div class="font-selector" id="fonts-${side}">
+      ${cfg.fonts.map(f => `<button class="font-opt" data-font="${f}" onclick="setFont('${side}',this)">${f === 'Hebrew' ? 'עברית רגילה' : f}</button>`).join('')}
+    </div>` : ''}
+    <div class="eng-required-label">
+      <span style="font-size:0.68rem;color:#2A2520">טקסט לחריטה</span>
+      <span class="eng-required-tag">* חובה</span>
+    </div>
+    <input class="eng-text-input" id="text-${side}" type="text" maxlength="${cfg.max_chars||20}"
+           placeholder="הכנס את הטקסט שיחרט על התכשיט..." oninput="onTextInput('${side}',this)">
+    <div class="eng-error-msg" id="error-${side}">נא להזין טקסט לחריטה לפני ההוספה לסל</div>
+    <div class="eng-char-count"><span id="chars-${side}">0</span> / ${cfg.max_chars||20} תווים</div>
+  </div>`;
+
+  // Image upload fields
+  if (hasImage) {
+    html += `<div id="img-fields-${side}" style="display:none">
+      <div class="eng-img-upload" onclick="document.getElementById('img-input-${side}').click()">
+        <input type="file" id="img-input-${side}" accept="image/*" onchange="onImageSelect('${side}',this)">
+        <img class="eng-img-preview" id="img-preview-${side}" src="" alt="">
+        <div class="eng-img-upload-label" id="img-label-${side}">
+          לחץ להעלאת תמונה לחריטה<br><small style="opacity:.6">JPG / PNG · עד 5MB</small>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  return html;
+}
+
+// ══════════════════════════════════════════════════════════
+// ATTACH EVENTS & INIT DEFAULT STATE
+// ══════════════════════════════════════════════════════════
+function attachEngravingEvents(front, back, multiNames) {
+  const es = product.engraving_settings || {};
+  const f  = es.front || front;
+
+  // Set initial type for front
+  if (f.types && f.types.length > 0) {
+    setType('front', f.types[0]);
+  }
+  // Auto-select first font — front
+  const firstFrontFont = document.querySelector('#fonts-front .font-opt');
+  if (firstFrontFont) setFont('front', firstFrontFont);
+
+  // Set initial type for back
+  if (back.enabled && back.types && back.types.length > 0) {
+    setType('back', back.types[0]);
+  }
+  // Auto-select first font — back
+  const firstBackFont = document.querySelector('#fonts-back .font-opt');
+  if (firstBackFont) setFont('back', firstBackFont);
+
+  // Init multi-names with 1 slot
+  if (multiNames.enabled) addNameSlot();
+}
+
+// ══════════════════════════════════════════════════════════
+// ENGRAVING INTERACTIONS
+// ══════════════════════════════════════════════════════════
+
+function switchSide(side) {
+  ['front','back'].forEach(s => {
+    document.getElementById(`tab-${s}`)?.classList.toggle('active', s === side);
+    document.getElementById(`panel-${s}`).style.display = s === side ? 'block' : 'none';
+  });
+}
+
+function setType(side, type) {
+  state[side].type = type;
+  const isText = type === 'text';
+
+  document.getElementById(`type-text-${side}`)?.classList.toggle('active', isText);
+  document.getElementById(`type-img-${side}`)?.classList.toggle('active', !isText);
+  document.getElementById(`text-fields-${side}`).style.display = isText  ? 'block' : 'none';
+  const imgFields = document.getElementById(`img-fields-${side}`);
+  if (imgFields) imgFields.style.display = !isText ? 'block' : 'none';
+
+  updatePriceSummary();
+}
+
+function setFont(side, el) {
+  document.querySelectorAll(`#fonts-${side} .font-opt`).forEach(f => f.classList.remove('active'));
+  el.classList.add('active');
+  state[side].font = el.dataset.font;
+}
+
+function onTextInput(side, el) {
+  state[side].text = el.value;
+  const countEl = document.getElementById(`chars-${side}`);
+  if (countEl) countEl.textContent = el.value.length;
+  // Clear error state once user starts typing
+  if (el.value.trim()) {
+    el.classList.remove('error');
+    const errMsg = document.getElementById(`error-${side}`);
+    if (errMsg) errMsg.style.display = 'none';
+  }
+  updatePriceSummary();
+}
+
+function onImageSelect(side, input) {
+  if (!input.files.length) return;
+  state[side].imageFile = input.files[0];
+  const reader = new FileReader();
+  reader.onload = e => {
+    const prev  = document.getElementById(`img-preview-${side}`);
+    const label = document.getElementById(`img-label-${side}`);
+    prev.src   = e.target.result;
+    prev.style.display = 'block';
+    label.style.display = 'none';
+  };
+  reader.readAsDataURL(input.files[0]);
+  updatePriceSummary();
+}
+
+// ── Multi-names ─────────────────────────────────────────
+const multiNames_cfg = () => (product.engraving_settings?.multi_names || {});
+
+function addNameSlot() {
+  const cfg     = multiNames_cfg();
+  const max     = cfg.max_names || 5;
+  if (state.names.length >= max) return;
+
+  const idx = state.names.length;
+  state.names.push({ text: '' });
+
+  const li = document.createElement('div');
+  li.className = 'name-input-row';
+  li.innerHTML = `
+    <label>${cfg.slot_label || 'שם'} ${idx + 1}</label>
+    <input type="text" placeholder="הכנס ${cfg.slot_label || 'שם'}..."
+           oninput="state.names[${idx}].text=this.value;updatePriceSummary()">`;
+  document.getElementById('names-list').appendChild(li);
+
+  // Hide add button if max reached
+  if (state.names.length >= max)
+    document.getElementById('add-name-btn').style.display = 'none';
+
+  updatePriceSummary();
+}
+
+// ══════════════════════════════════════════════════════════
+// PRICE SUMMARY
+// ══════════════════════════════════════════════════════════
+function updatePriceSummary() {
+  if (!product.is_engravable) return;
+  const es = product.engraving_settings || {};
+  const front      = es.front      || {};
+  const back       = es.back       || {};
+  const multiNames = es.multi_names|| {};
+
+  let frontAdd = 0, backAdd = 0, namesAdd = 0;
+
+  // Front engraving cost (if text entered or image selected)
+  const frontHasContent = state.front.text.trim() || state.front.imageFile;
+  if (frontHasContent) frontAdd = front.price_addition || 0;
+
+  // Back engraving cost
+  const backHasContent = back.enabled && (state.back.text.trim() || state.back.imageFile);
+  if (backHasContent) backAdd = back.price_addition || 0;
+
+  // Names cost
+  if (multiNames.enabled) {
+    const filledNames = state.names.filter(n => n.text.trim()).length;
+    namesAdd = filledNames * (multiNames.price_per_name || 0);
+  }
+
+  const total    = basePrice + frontAdd + backAdd + namesAdd;
+  const hasExtra = frontAdd + backAdd + namesAdd > 0;
+
+  // Update main price display
+  document.getElementById('display-price').textContent = total.toLocaleString('he-IL') + ' ₪';
+
+  // Front row
+  const frontRow = document.getElementById('ps-front-row');
+  if (frontRow) {
+    frontRow.style.display = frontHasContent && frontAdd > 0 ? 'flex' : 'none';
+    const fv = document.getElementById('ps-front-val');
+    if (fv) fv.textContent = `+${frontAdd} ₪`;
+  }
+
+  // Back row
+  const backRow = document.getElementById('ps-back-row');
+  if (backRow) {
+    backRow.style.display = backHasContent && backAdd > 0 ? 'flex' : 'none';
+    const bv = document.getElementById('ps-back-val');
+    if (bv) bv.textContent = `+${backAdd} ₪`;
+  }
+
+  // Names row
+  const namesRow = document.getElementById('ps-names-row');
+  if (namesRow) {
+    const filled = state.names.filter(n => n.text.trim()).length;
+    namesRow.style.display = filled > 0 && namesAdd > 0 ? 'flex' : 'none';
+    const nl = document.getElementById('ps-names-label');
+    const nv = document.getElementById('ps-names-val');
+    if (nl) nl.textContent = `${filled} שמות`;
+    if (nv) nv.textContent = `+${namesAdd} ₪`;
+  }
+
+  // Total row — only visible when there are additions
+  const totalRow = document.getElementById('ps-total-row');
+  if (totalRow) {
+    totalRow.style.display = hasExtra ? 'flex' : 'none';
+    const pt = document.getElementById('ps-total');
+    if (pt) pt.textContent = total.toLocaleString('he-IL') + ' ₪';
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// ADD TO CART
+// ══════════════════════════════════════════════════════════
+function addToCart() {
+  const es         = product.engraving_settings || {};
+  const multiNames = es.multi_names || {};
+
+  // ── Validation: require engraving text if product is engravable ──
+  if (product.is_engravable) {
+    const frontCfg = es.front || {};
+    const hasFrontText = frontCfg.types && frontCfg.types.includes('text');
+    if (hasFrontText && !state.front.text.trim()) {
+      const input = document.getElementById('text-front');
+      const errMsg = document.getElementById('error-front');
+      if (input) {
+        input.classList.add('error', 'shake');
+        input.focus();
+        setTimeout(() => input.classList.remove('shake'), 400);
+      }
+      if (errMsg) errMsg.style.display = 'block';
+      return; // stop — don't add to cart
+    }
+  }
+
+  const total = calcTotal();
+
+  // Simple cart via localStorage
+  const cart = JSON.parse(localStorage.getItem('olives_cart') || '[]');
+  cart.push({
+    id:       product.id,
+    name:     product.name,
+    price:    total,
+    image:    product.image_url,
+    engraving: product.is_engravable ? {
+      front_text:  state.front.text  || null,
+      front_font:  state.front.font  || null,
+      back_text:   state.back.text   || null,
+      names:       multiNames.enabled ? state.names.map(n => n.text).filter(Boolean) : null
+    } : null
+  });
+  localStorage.setItem('olives_cart', JSON.stringify(cart));
+
+  // Update badge
+  document.querySelectorAll('.cart-count').forEach(el => el.textContent = cart.length);
+
+  // Feedback
+  const btn = document.querySelector('.btn-add-cart');
+  const orig = btn.textContent;
+  btn.textContent = '✓ נוסף לסל!';
+  btn.style.background = '#3B402A';
+  setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 2000);
+}
+
+function calcTotal() {
+  const es         = product.engraving_settings || {};
+  const front      = es.front       || {};
+  const back       = es.back        || {};
+  const multiNames = es.multi_names || {};
+  let add = 0;
+  if (state.front.text.trim() || state.front.imageFile) add += front.price_addition || 0;
+  if (back.enabled && (state.back.text.trim() || state.back.imageFile)) add += back.price_addition || 0;
+  if (multiNames.enabled) add += state.names.filter(n => n.text.trim()).length * (multiNames.price_per_name || 0);
+  return basePrice + add;
+}
+
+// ══════════════════════════════════════════════════════════
+// NOT FOUND
+// ══════════════════════════════════════════════════════════
+function renderNotFound() {
+  document.getElementById('main-content').innerHTML = `
+    <div class="not-found">
+      <h2>המוצר לא נמצא</h2>
+      <p style="font-size:.9rem;opacity:.6;margin-bottom:1.5rem">ייתכן שהמוצר הוסר או שהכתובת שגויה.</p>
+      <a href="shop.html" class="btn-outline">חזרה לחנות</a>
+    </div>`;
+}
+
+// ── Restore cart count on load ──────────────────────────
+(function() {
+  const cart = JSON.parse(localStorage.getItem('olives_cart') || '[]');
+  document.querySelectorAll('.cart-count').forEach(el => el.textContent = cart.length);
+})();
+</script>
+</body>
+</html>

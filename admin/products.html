@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>מוצרים – Olives Admin</title>
+  <link rel="stylesheet" href="./admin.css">
+</head>
+<body>
+<div class="admin-layout">
+
+  <!-- ── Sidebar ─────────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <span class="brand-name">OLIVES</span>
+      <span class="brand-sub">Admin Panel</span>
+    </div>
+    <nav class="sidebar-nav">
+      <span class="nav-section-title">ראשי</span>
+      <a href="./dashboard.html" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <span class="nav-section-title">קטלוג</span>
+      <a href="./products.html" class="nav-link active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+        מוצרים
+      </a>
+      <span class="nav-section-title">מכירות</span>
+      <a href="./orders.html" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/></svg>
+        הזמנות
+      </a>
+    </nav>
+    <div class="sidebar-footer">Olives Jewelry &copy; 2026</div>
+  </aside>
+
+  <!-- ── Main ───────────────────────────────────────────── -->
+  <div class="main-content">
+    <header class="topbar">
+      <span class="topbar-title">ניהול מוצרים</span>
+      <div class="topbar-right">
+        <div class="topbar-user">
+          <div class="avatar">A</div>
+          <span id="admin-username">admin</span>
+        </div>
+        <button class="btn-logout" onclick="logout()">יציאה</button>
+      </div>
+    </header>
+
+    <main class="page-content">
+      <div class="page-header">
+        <div>
+          <h1>מוצרים</h1>
+          <p>ניהול קטלוג, מלאי, תמונות והגדרות חריטה מלאות</p>
+        </div>
+        <button class="btn btn-primary" onclick="openAddModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          מוצר חדש
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="filter-bar">
+          <input type="search" class="filter-input search" id="f-search" placeholder="🔍 חיפוש לפי שם...">
+          <select class="filter-input" id="f-category">
+            <option value="">כל הקטגוריות</option>
+            <option>צמידי חריטה</option><option>שרשראות חריטה</option>
+            <option>טבעות חריטה</option><option>צמידים</option>
+            <option>שרשראות</option><option>עגילים</option>
+          </select>
+          <select class="filter-input" id="f-engravable">
+            <option value="">חריטה – הכל</option>
+            <option value="true">ניתן לחריטה</option>
+            <option value="false">ללא חריטה</option>
+          </select>
+          <button class="btn btn-ghost btn-sm" onclick="loadProducts()">רענן</button>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>מוצר</th><th>קטגוריה</th><th>מחיר</th>
+                <th>מלאי</th><th>חריטה</th><th>פעולות</th>
+              </tr>
+            </thead>
+            <tbody id="products-body">
+              <tr><td colspan="6" style="text-align:center;padding:2.5rem;color:var(--text-muted)">טוען...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PRODUCT MODAL — Add / Edit
+══════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="product-modal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">מוצר חדש</span>
+      <button class="modal-close" onclick="closeModal('product-modal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="product-form" novalidate>
+        <input type="hidden" id="edit-id">
+
+        <!-- ─── שם + תיאור ─────────────────────────────── -->
+        <div class="form-group">
+          <label class="form-label">שם המוצר <span class="req">*</span></label>
+          <input id="f-name" type="text" class="form-control" placeholder="לדוגמה: צמיד שמות ילדים זהב" required>
+          <div class="form-error" id="e-name">שדה חובה</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">תיאור</label>
+          <textarea id="f-desc" class="form-control" rows="2" placeholder="תיאור קצר של המוצר..."></textarea>
+        </div>
+
+        <!-- ─── מחיר + מלאי ─────────────────────────────── -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">מחיר בסיס (₪) <span class="req">*</span></label>
+            <input id="f-price" type="number" class="form-control" placeholder="189" min="0" step="1" required>
+            <div class="form-error" id="e-price">מחיר חובה</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">מלאי</label>
+            <input id="f-stock" type="number" class="form-control" placeholder="0" min="0" step="1">
+          </div>
+        </div>
+
+        <!-- ─── קטגוריה ───────────────────────────────── -->
+        <div class="form-group">
+          <label class="form-label">קטגוריה <span class="req">*</span></label>
+          <select id="f-cat" class="form-control" required>
+            <option value="">בחר קטגוריה...</option>
+            <option>צמידי חריטה</option><option>שרשראות חריטה</option>
+            <option>טבעות חריטה</option><option>צמידים</option>
+            <option>שרשראות</option><option>עגילים</option>
+          </select>
+          <div class="form-error" id="e-cat">בחר קטגוריה</div>
+        </div>
+
+        <!-- ─── תמונת מוצר ─────────────────────────────── -->
+        <div class="form-group">
+          <label class="form-label">תמונת מוצר</label>
+          <div class="img-upload-zone" id="img-upload-zone" onclick="document.getElementById('img-file-input').click()">
+            <img id="img-preview" class="img-preview-large" src="" style="display:none" alt="תצוגה מקדימה">
+            <div class="img-upload-placeholder" id="img-placeholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:32px;height:32px;opacity:.35;margin-bottom:0.5rem">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              <span>לחץ להעלאת תמונה</span>
+              <small>PNG, JPG עד 5MB</small>
+            </div>
+          </div>
+          <input type="file" id="img-file-input" accept="image/*" style="display:none" onchange="handleImageSelect(this)">
+          <div class="form-hint" style="margin-top:0.5rem">או הכנס נתיב ישיר לתמונה:</div>
+          <input id="f-image" type="text" class="form-control" placeholder="/product-necklace.png"
+                 style="margin-top:0.35rem" oninput="previewFromUrl(this.value)">
+        </div>
+
+        <!-- ─── Slug ──────────────────────────────────── -->
+        <div class="form-group">
+          <label class="form-label">Slug (כתובת URL ידידותית)</label>
+          <input id="f-slug" type="text" class="form-control" placeholder="צמיד-חריטה-כסף"
+                 oninput="this.value=this.value.replace(/\s+/g,'-').toLowerCase()">
+          <div class="form-hint">אותיות לועזיות, מספרים ומקפים בלבד. יווצר אוטומטית אם ריק.</div>
+        </div>
+
+        <!-- ─── פרטי תצוגה ───────────────────────────── -->
+        <div style="border-top:1px solid var(--border);padding-top:1.1rem;margin-top:0.75rem">
+          <div style="font-weight:600;font-size:0.85rem;margin-bottom:0.85rem;color:var(--text)">
+            פרטי מוצר לתצוגה (חומר · עמידות · משלוח)
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">חומר</label>
+              <input id="f-material" type="text" class="form-control" placeholder="זהב 18K / כסף 925">
+            </div>
+            <div class="form-group">
+              <label class="form-label">עמידות</label>
+              <input id="f-waterproof" type="text" class="form-control" placeholder="עמיד במים">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">משלוח</label>
+              <input id="f-shipping" type="text" class="form-control" placeholder="2–4 ימי עסקים">
+            </div>
+            <div class="form-group">
+              <label class="form-label">הערת חריטה (מוצג רק אם ניתן לחריטה)</label>
+              <input id="f-engraving-note" type="text" class="form-control" placeholder="עבודת יד אישית">
+            </div>
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════
+             ENGRAVING SECTION
+        ══════════════════════════════════════════════ -->
+        <div style="border-top:1px solid var(--border);padding-top:1.1rem;margin-top:0.75rem">
+          <div class="toggle-row">
+            <label class="toggle">
+              <input type="checkbox" id="f-engravable" onchange="toggleEngravingFields(this.checked)">
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="toggle-label-text" style="font-weight:600">המוצר ניתן לחריטה</span>
+          </div>
+        </div>
+
+        <!-- ─── תיבת חריטה מלאה ─────────────────────── -->
+        <div class="engraving-box" id="engraving-box">
+
+          <!-- ══ צד קדמי ══════════════════════════════ -->
+          <div class="eng-section-title">✏️ צד קדמי</div>
+
+          <!-- סוג חריטה קדמי -->
+          <div class="form-group">
+            <label class="form-label">סוג חריטה אפשרי</label>
+            <div class="type-toggles">
+              <label class="type-pill">
+                <input type="checkbox" id="f-front-text" value="text" onchange="updateFrontTextVis()"> טקסט
+              </label>
+              <label class="type-pill">
+                <input type="checkbox" id="f-front-image" value="image"> 🖼️ תמונה
+              </label>
+            </div>
+            <div class="form-hint">בחר מה הלקוח יוכל לחרוט בצד קדמי</div>
+          </div>
+
+          <!-- שדות טקסט קדמי -->
+          <div id="front-text-fields">
+            <div class="form-group">
+              <label class="form-label">פונטים זמינים לצד קדמי</label>
+              <div class="font-tags" id="font-tags-front">
+                <span class="font-tag" data-font="Script"  onclick="toggleFont(this,'front')">Script</span>
+                <span class="font-tag" data-font="Block"   onclick="toggleFont(this,'front')">Block</span>
+                <span class="font-tag" data-font="Hebrew"  onclick="toggleFont(this,'front')">עברית</span>
+                <span class="font-tag" data-font="Italic"  onclick="toggleFont(this,'front')">Italic</span>
+                <span class="font-tag" data-font="Bold"    onclick="toggleFont(this,'front')">Bold</span>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">מגבלת תווים (טקסט)</label>
+                <input id="f-front-maxchars" type="number" class="form-control" placeholder="20" min="1" max="100">
+              </div>
+              <div class="form-group">
+                <label class="form-label">תוספת מחיר חריטה קדמית (₪)</label>
+                <input id="f-front-price" type="number" class="form-control" placeholder="0" min="0" step="1">
+                <div class="form-hint">0 = חריטה חינם</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ══ צד אחורי ══════════════════════════════ -->
+          <div style="border-top:1px solid rgba(59,64,42,0.12);padding-top:1rem;margin-top:0.75rem">
+            <div class="toggle-row">
+              <label class="toggle">
+                <input type="checkbox" id="f-back-enabled" onchange="toggleBackSide(this.checked)">
+                <span class="toggle-slider"></span>
+              </label>
+              <span class="toggle-label-text">ניתן לחריטה גם בצד אחורי</span>
+            </div>
+          </div>
+
+          <div class="eng-sub-box" id="back-side-box">
+            <div class="eng-section-title" style="margin-top:0">🔄 צד אחורי</div>
+
+            <div class="form-group">
+              <label class="form-label">סוג חריטה אחורי</label>
+              <div class="type-toggles">
+                <label class="type-pill">
+                  <input type="checkbox" id="f-back-text" value="text"> ✏️ טקסט
+                </label>
+                <label class="type-pill">
+                  <input type="checkbox" id="f-back-image" value="image"> 🖼️ תמונה
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">פונטים זמינים לצד אחורי</label>
+              <div class="font-tags" id="font-tags-back">
+                <span class="font-tag" data-font="Script" onclick="toggleFont(this,'back')">Script</span>
+                <span class="font-tag" data-font="Block"  onclick="toggleFont(this,'back')">Block</span>
+                <span class="font-tag" data-font="Hebrew" onclick="toggleFont(this,'back')">עברית</span>
+                <span class="font-tag" data-font="Italic" onclick="toggleFont(this,'back')">Italic</span>
+                <span class="font-tag" data-font="Bold"   onclick="toggleFont(this,'back')">Bold</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">מגבלת תווים (אחורי)</label>
+                <input id="f-back-maxchars" type="number" class="form-control" placeholder="15" min="1" max="100">
+              </div>
+              <div class="form-group">
+                <label class="form-label">תוספת מחיר צד אחורי (₪)</label>
+                <input id="f-back-price" type="number" class="form-control" placeholder="50" min="0" step="1">
+                <div class="form-hint">מחיר נוסף לחריטה אחורית</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ══ שמות מרובים ══════════════════════════ -->
+          <div style="border-top:1px solid rgba(59,64,42,0.12);padding-top:1rem;margin-top:0.75rem">
+            <div class="toggle-row">
+              <label class="toggle">
+                <input type="checkbox" id="f-multinames" onchange="toggleMultiNames(this.checked)">
+                <span class="toggle-slider"></span>
+              </label>
+              <span class="toggle-label-text">מצב שמות מרובים (לדוגמה: צמיד שמות ילדים)</span>
+            </div>
+          </div>
+
+          <div class="eng-sub-box" id="multi-names-box">
+            <div class="eng-section-title" style="margin-top:0">👨‍👩‍👧‍👦 שמות מרובים</div>
+
+            <div class="form-group">
+              <label class="form-label">שם השדה ללקוח</label>
+              <input id="f-name-label" type="text" class="form-control" placeholder='שם ילד / שם / כיתוב'>
+              <div class="form-hint">הטקסט שיופיע מעל כל שדה הזנה ללקוח</div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">מספר שמות מקסימלי</label>
+                <input id="f-max-names" type="number" class="form-control" placeholder="5" min="2" max="20">
+              </div>
+              <div class="form-group">
+                <label class="form-label">מחיר לכל שם נוסף (₪)</label>
+                <input id="f-name-price" type="number" class="form-control" placeholder="30" min="0" step="1">
+                <div class="form-hint">יתווסף לסל לכל שם שהוזן</div>
+              </div>
+            </div>
+
+            <!-- תצוגה מקדימה של עלות -->
+            <div class="price-preview" id="names-price-preview">
+              <span class="price-preview-label">לדוגמה: 3 שמות</span>
+              <span class="price-preview-value" id="names-price-example">= ₪0</span>
+            </div>
+          </div>
+
+        </div><!-- /engraving-box -->
+
+      </form>
+    </div><!-- /modal-body -->
+    <div class="modal-footer">
+      <button class="btn btn-primary" id="save-btn" onclick="saveProduct()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        שמור מוצר
+      </button>
+      <button class="btn btn-ghost" onclick="closeModal('product-modal')">ביטול</button>
+    </div>
+  </div>
+</div>
+
+<!-- Stock quick-edit modal -->
+<div class="modal-overlay" id="stock-modal">
+  <div class="modal" style="max-width:340px">
+    <div class="modal-header">
+      <span class="modal-title">עדכון מלאי מהיר</span>
+      <button class="modal-close" onclick="closeModal('stock-modal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="stock-product-id">
+      <div class="form-group">
+        <label class="form-label">כמות במלאי</label>
+        <input id="stock-qty" type="number" class="form-control" min="0" step="1">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="saveStock()">עדכן מלאי</button>
+      <button class="btn btn-ghost" onclick="closeModal('stock-modal')">ביטול</button>
+    </div>
+  </div>
+</div>
+
+<script src="./admin.js"></script>
+<script>
+requireAuth().then(loadProducts);
+
+// ── Live filters ──────────────────────────────────────────
+['f-search','f-category','f-engravable'].forEach(id =>
+  document.getElementById(id).addEventListener('input', loadProducts)
+);
+
+// Price preview for multi-names
+['f-name-price','f-max-names'].forEach(id =>
+  document.getElementById(id)?.addEventListener('input', updateNamesPricePreview)
+);
+
+// ── Load products ─────────────────────────────────────────
+async function loadProducts() {
+  const search        = document.getElementById('f-search').value;
+  const category      = document.getElementById('f-category').value;
+  const is_engravable = document.getElementById('f-engravable').value;
+  const params = new URLSearchParams();
+  if (search)        params.set('search', search);
+  if (category)      params.set('category', category);
+  if (is_engravable) params.set('is_engravable', is_engravable);
+  try {
+    const products = await api('GET', '/admin/products?' + params);
+    renderProducts(products);
+  } catch (e) { toastErr(e.message); }
+}
+
+function renderProducts(list) {
+  const tbody = document.getElementById('products-body');
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8"/></svg>
+      <p>לא נמצאו מוצרים</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map(p => {
+    const stockBadge = p.stock_quantity < 5
+      ? `<span class="badge badge-low">${p.stock_quantity}</span>`
+      : `<span style="font-weight:600">${p.stock_quantity}</span>`;
+
+    const es = p.engraving_settings;
+    let engBadge = `<span style="color:var(--text-muted);font-size:0.8rem">—</span>`;
+    if (p.is_engravable) {
+      const hasBack  = es?.back?.enabled;
+      const hasNames = es?.multi_names?.enabled;
+      engBadge = `<span class="badge badge-engraving">✏️ כן</span>
+        ${hasBack  ? '<span class="badge" style="background:rgba(21,101,192,0.1);color:var(--info);margin-right:3px">🔄 גב</span>' : ''}
+        ${hasNames ? '<span class="badge" style="background:rgba(106,27,154,0.1);color:var(--purple);margin-right:3px">👥 שמות</span>' : ''}`;
+    }
+
+    return `<tr>
+      <td>
+        <div class="product-cell">
+          <img src="${p.image_url||''}" class="product-thumb"
+               onerror="this.style.background='#EDE5DE';this.removeAttribute('src')">
+          <div><div class="product-cell-name">${p.name}</div></div>
+        </div>
+      </td>
+      <td><span style="font-size:0.8rem;color:var(--text-muted)">${p.category}</span></td>
+      <td><strong>${fmtMoney(p.price)}</strong></td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="openStockModal(${p.id},${p.stock_quantity})">
+          ${stockBadge}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;opacity:.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+      </td>
+      <td>${engBadge}</td>
+      <td>
+        <div style="display:flex;gap:0.4rem">
+          <a href="http://localhost:3000/product.html?id=${p.id}" target="_blank"
+             class="btn btn-ghost btn-icon btn-sm" title="צפה בחנות">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          </a>
+          <button class="btn btn-ghost btn-icon btn-sm" title="עריכה" onclick="openEditModal(${p.id})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="btn btn-danger-soft btn-icon btn-sm" title="מחיקה" onclick="deleteProduct(${p.id},'${p.name.replace(/'/g,"\\'")}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6m5 0V4h4v2"/></svg>
+          </button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Open Add modal ────────────────────────────────────────
+function openAddModal() {
+  document.getElementById('modal-title').textContent = 'מוצר חדש';
+  document.getElementById('product-form').reset();
+  document.getElementById('edit-id').value = '';
+  resetEngravingFields();
+  resetImagePreview();
+  openModal('product-modal');
+}
+
+// ── Open Edit modal ───────────────────────────────────────
+async function openEditModal(id) {
+  try {
+    const p = await api('GET', `/admin/products/${id}`);
+    document.getElementById('modal-title').textContent = 'עריכת מוצר';
+    document.getElementById('edit-id').value  = p.id;
+    document.getElementById('f-name').value   = p.name;
+    document.getElementById('f-desc').value   = p.description || '';
+    document.getElementById('f-price').value  = p.price;
+    document.getElementById('f-stock').value  = p.stock_quantity;
+    document.getElementById('f-cat').value    = p.category;
+    document.getElementById('f-image').value        = p.image_url || '';
+    document.getElementById('f-slug').value          = p.slug || '';
+    document.getElementById('f-material').value      = p.details_material   || '';
+    document.getElementById('f-waterproof').value    = p.details_waterproof || '';
+    document.getElementById('f-shipping').value      = p.details_shipping   || '';
+    document.getElementById('f-engraving-note').value= p.details_engraving  || '';
+    previewFromUrl(p.image_url);
+
+    resetEngravingFields();
+    document.getElementById('f-engravable').checked = p.is_engravable;
+
+    if (p.is_engravable) {
+      const es = p.engraving_settings || {};
+
+      // ── Normalise old-format (flat) vs new-format (nested)
+      const front = es.front || {
+        types:         es.types         || (es.max_chars ? ['text'] : []),
+        max_chars:     es.max_chars     || 20,
+        fonts:         es.fonts         || [],
+        price_addition:es.price_addition|| 0
+      };
+      const back       = es.back        || { enabled: false };
+      const multiNames = es.multi_names || { enabled: false };
+
+      // Front types
+      document.getElementById('f-front-text').checked  = front.types.includes('text');
+      document.getElementById('f-front-image').checked = front.types.includes('image');
+      updateFrontTextVis();
+
+      // Front text fields
+      document.getElementById('f-front-maxchars').value = front.max_chars  || '';
+      document.getElementById('f-front-price').value    = front.price_addition || 0;
+      (front.fonts || []).forEach(font => {
+        const tag = document.querySelector(`#font-tags-front .font-tag[data-font="${font}"]`);
+        if (tag) tag.classList.add('active');
+      });
+
+      // Back side
+      if (back.enabled) {
+        document.getElementById('f-back-enabled').checked = true;
+        toggleBackSide(true);
+        document.getElementById('f-back-text').checked  = (back.types||[]).includes('text');
+        document.getElementById('f-back-image').checked = (back.types||[]).includes('image');
+        document.getElementById('f-back-maxchars').value = back.max_chars   || '';
+        document.getElementById('f-back-price').value    = back.price_addition || 0;
+        (back.fonts || []).forEach(font => {
+          const tag = document.querySelector(`#font-tags-back .font-tag[data-font="${font}"]`);
+          if (tag) tag.classList.add('active');
+        });
+      }
+
+      // Multi-names
+      if (multiNames.enabled) {
+        document.getElementById('f-multinames').checked = true;
+        toggleMultiNames(true);
+        document.getElementById('f-name-label').value  = multiNames.slot_label  || '';
+        document.getElementById('f-max-names').value   = multiNames.max_names   || '';
+        document.getElementById('f-name-price').value  = multiNames.price_per_name || 0;
+        updateNamesPricePreview();
+      }
+
+      toggleEngravingFields(true);
+    }
+
+    openModal('product-modal');
+  } catch (e) { toastErr(e.message); }
+}
+
+// ── Save product ──────────────────────────────────────────
+async function saveProduct() {
+  // Validation
+  let valid = true;
+  [['f-name','e-name'],['f-price','e-price'],['f-cat','e-cat']].forEach(([fid, eid]) => {
+    const el = document.getElementById(fid);
+    const er = document.getElementById(eid);
+    if (!el.value.trim()) { el.classList.add('is-error'); er?.classList.add('show'); valid = false; }
+    else { el.classList.remove('is-error'); er?.classList.remove('show'); }
+  });
+  if (!valid) return;
+
+  // Build engraving_settings
+  const isEngravable = document.getElementById('f-engravable').checked;
+  let engraving_settings = null;
+
+  if (isEngravable) {
+    const frontTypes = [];
+    if (document.getElementById('f-front-text').checked)  frontTypes.push('text');
+    if (document.getElementById('f-front-image').checked) frontTypes.push('image');
+
+    const backEnabled = document.getElementById('f-back-enabled').checked;
+    const backTypes   = [];
+    if (backEnabled) {
+      if (document.getElementById('f-back-text').checked)  backTypes.push('text');
+      if (document.getElementById('f-back-image').checked) backTypes.push('image');
+    }
+
+    const multiEnabled = document.getElementById('f-multinames').checked;
+
+    engraving_settings = {
+      front: {
+        types:          frontTypes,
+        max_chars:      parseInt(document.getElementById('f-front-maxchars').value) || 20,
+        fonts:          [...document.querySelectorAll('#font-tags-front .font-tag.active')].map(t => t.dataset.font),
+        price_addition: parseFloat(document.getElementById('f-front-price').value) || 0
+      },
+      back: {
+        enabled:        backEnabled,
+        types:          backTypes,
+        fonts:          [...document.querySelectorAll('#font-tags-back .font-tag.active')].map(t => t.dataset.font),
+        max_chars:      parseInt(document.getElementById('f-back-maxchars').value) || 15,
+        price_addition: parseFloat(document.getElementById('f-back-price').value) || 0
+      },
+      multi_names: {
+        enabled:       multiEnabled,
+        max_names:     parseInt(document.getElementById('f-max-names').value) || 5,
+        price_per_name:parseFloat(document.getElementById('f-name-price').value) || 0,
+        slot_label:    document.getElementById('f-name-label').value.trim() || 'שם'
+      }
+    };
+  }
+
+  // Auto-generate slug from name if empty
+  let slug = document.getElementById('f-slug').value.trim();
+  if (!slug) {
+    slug = document.getElementById('f-name').value.trim()
+      .toLowerCase().replace(/\s+/g, '-')
+      .replace(/[^\w\-]/g, '').replace(/--+/g, '-');
+  }
+
+  const body = {
+    name:               document.getElementById('f-name').value.trim(),
+    slug,
+    description:        document.getElementById('f-desc').value.trim(),
+    price:              document.getElementById('f-price').value,
+    image_url:          document.getElementById('f-image').value.trim(),
+    category:           document.getElementById('f-cat').value,
+    stock_quantity:     document.getElementById('f-stock').value || 0,
+    details_material:   document.getElementById('f-material').value.trim(),
+    details_waterproof: document.getElementById('f-waterproof').value.trim(),
+    details_shipping:   document.getElementById('f-shipping').value.trim(),
+    details_engraving:  document.getElementById('f-engraving-note').value.trim(),
+    is_engravable:      isEngravable,
+    engraving_settings
+  };
+
+  const editId = document.getElementById('edit-id').value;
+  const btn    = document.getElementById('save-btn');
+  btn.disabled = true; btn.textContent = 'שומר...';
+
+  try {
+    let productId = editId;
+
+    // Save product
+    if (editId) {
+      await api('PUT', `/admin/products/${editId}`, body);
+    } else {
+      const res = await api('POST', '/admin/products', body);
+      productId = res.id;
+    }
+
+    // Upload image if file was selected
+    const fileInput = document.getElementById('img-file-input');
+    if (fileInput.files.length && productId) {
+      const fd = new FormData();
+      fd.append('image', fileInput.files[0]);
+      const token = localStorage.getItem('admin_token');
+      const r = await fetch(`/admin/products/${productId}/image`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: fd
+      });
+      if (!r.ok) throw new Error('שגיאה בהעלאת התמונה');
+    }
+
+    toastOk(editId ? 'מוצר עודכן בהצלחה ✓' : 'מוצר חדש נוסף ✓');
+    closeModal('product-modal');
+    loadProducts();
+  } catch (e) { toastErr(e.message); }
+  finally {
+    btn.disabled = false;
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> שמור מוצר`;
+  }
+}
+
+// ── Delete ────────────────────────────────────────────────
+async function deleteProduct(id, name) {
+  if (!confirmAction(`למחוק את "${name}"?`)) return;
+  try {
+    await api('DELETE', `/admin/products/${id}`);
+    toastOk('מוצר הוסר');
+    loadProducts();
+  } catch (e) { toastErr(e.message); }
+}
+
+// ── Stock quick edit ──────────────────────────────────────
+function openStockModal(id, qty) {
+  document.getElementById('stock-product-id').value = id;
+  document.getElementById('stock-qty').value = qty;
+  openModal('stock-modal');
+}
+async function saveStock() {
+  const id  = document.getElementById('stock-product-id').value;
+  const qty = document.getElementById('stock-qty').value;
+  try {
+    await api('PATCH', `/admin/products/${id}/stock`, { stock_quantity: qty });
+    toastOk('מלאי עודכן ✓');
+    closeModal('stock-modal');
+    loadProducts();
+  } catch (e) { toastErr(e.message); }
+}
+
+// ══════════════════════════════════════════════════════════
+// ENGRAVING HELPERS
+// ══════════════════════════════════════════════════════════
+function toggleEngravingFields(show) {
+  document.getElementById('f-engravable').checked = show;
+  document.getElementById('engraving-box').classList.toggle('visible', show);
+}
+
+function toggleBackSide(show) {
+  document.getElementById('f-back-enabled').checked = show;
+  document.getElementById('back-side-box').classList.toggle('visible', show);
+}
+
+function toggleMultiNames(show) {
+  document.getElementById('f-multinames').checked = show;
+  document.getElementById('multi-names-box').classList.toggle('visible', show);
+  if (show) updateNamesPricePreview();
+}
+
+function updateFrontTextVis() {
+  // Always show text fields (max_chars etc.) when text is checked
+  const hasText = document.getElementById('f-front-text').checked;
+  document.getElementById('front-text-fields').style.opacity = hasText ? '1' : '0.4';
+}
+
+function toggleFont(el, side) { el.classList.toggle('active'); }
+
+function updateNamesPricePreview() {
+  const priceEach = parseFloat(document.getElementById('f-name-price').value) || 0;
+  const max       = parseInt(document.getElementById('f-max-names').value) || 5;
+  const example   = Math.min(3, max);
+  document.getElementById('names-price-example').textContent =
+    `= ₪${(priceEach * example).toLocaleString('he-IL')} (${example} שמות)`;
+}
+
+function resetEngravingFields() {
+  document.getElementById('f-engravable').checked   = false;
+  document.getElementById('f-back-enabled').checked = false;
+  document.getElementById('f-multinames').checked   = false;
+  document.getElementById('f-front-text').checked   = false;
+  document.getElementById('f-front-image').checked  = false;
+  document.getElementById('f-back-text').checked    = false;
+  document.getElementById('f-back-image').checked   = false;
+  document.querySelectorAll('.font-tag').forEach(t => t.classList.remove('active'));
+  ['f-front-maxchars','f-front-price','f-back-maxchars','f-back-price',
+   'f-name-label','f-max-names','f-name-price'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  toggleEngravingFields(false);
+  toggleBackSide(false);
+  toggleMultiNames(false);
+  updateFrontTextVis();
+}
+
+// ══════════════════════════════════════════════════════════
+// IMAGE HELPERS
+// ══════════════════════════════════════════════════════════
+function handleImageSelect(input) {
+  if (!input.files.length) return;
+  const file = input.files[0];
+  const reader = new FileReader();
+  reader.onload = e => showImagePreview(e.target.result);
+  reader.readAsDataURL(file);
+}
+
+function previewFromUrl(url) {
+  if (url) showImagePreview(url);
+  else resetImagePreview();
+}
+
+function showImagePreview(src) {
+  const img = document.getElementById('img-preview');
+  const ph  = document.getElementById('img-placeholder');
+  img.src   = src;
+  img.style.display = 'block';
+  ph.style.display  = 'none';
+}
+
+function resetImagePreview() {
+  const img = document.getElementById('img-preview');
+  const ph  = document.getElementById('img-placeholder');
+  img.src   = '';
+  img.style.display = 'none';
+  ph.style.display  = 'flex';
+  document.getElementById('img-file-input').value = '';
+}
+</script>
+</body>
+</html>

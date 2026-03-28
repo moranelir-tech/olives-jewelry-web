@@ -1,0 +1,24 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Olives Jewelry – Express Server (Production)",
+      "runtimeExecutable": "C:\\Program Files\\nodejs\\node.exe",
+      "runtimeArgs": ["server.js"],
+      "port": 3000,
+      "autoPort": false
+    },
+    {
+      "name": "Olives Jewelry – Dev Watch (nodemon)",
+      "runtimeExecutable": "C:\\Program Files\\nodejs\\node.exe",
+      "runtimeArgs": ["node_modules\\.bin\\nodemon", "server.js"],
+      "port": 3000
+    },
+    {
+      "name": "Static HTML Server (Python fallback)",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8080"],
+      "port": 8080
+    }
+  ]
+}

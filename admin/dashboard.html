@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard – Olives Admin</title>
+  <link rel="stylesheet" href="./admin.css">
+</head>
+<body>
+<div class="admin-layout">
+
+  <!-- ── Sidebar ─────────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <span class="brand-name">OLIVES</span>
+      <span class="brand-sub">Admin Panel</span>
+    </div>
+    <nav class="sidebar-nav">
+      <span class="nav-section-title">ראשי</span>
+      <a href="./dashboard.html" class="nav-link active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <span class="nav-section-title">קטלוג</span>
+      <a href="./products.html" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+        מוצרים
+      </a>
+      <span class="nav-section-title">מכירות</span>
+      <a href="./orders.html" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        הזמנות
+        <span class="nav-badge" id="sb-pending">0</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">Olives Jewelry &copy; 2026</div>
+  </aside>
+
+  <!-- ── Main ───────────────────────────────────────────── -->
+  <div class="main-content">
+    <header class="topbar">
+      <span class="topbar-title">Dashboard</span>
+      <div class="topbar-right">
+        <div class="topbar-user">
+          <div class="avatar">A</div>
+          <span id="admin-username">admin</span>
+        </div>
+        <button class="btn-logout" onclick="logout()">יציאה</button>
+      </div>
+    </header>
+
+    <main class="page-content">
+
+      <!-- KPI grid -->
+      <div class="kpi-grid" id="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon olive">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+          </div>
+          <div><div class="kpi-value" id="kpi-revenue">—</div><div class="kpi-label">הכנסות כוללות</div></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/></svg>
+          </div>
+          <div><div class="kpi-value" id="kpi-orders">—</div><div class="kpi-label">סה"כ הזמנות</div></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon orange">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div><div class="kpi-value" id="kpi-pending">—</div><div class="kpi-label">ממתינות לטיפול</div></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon gold">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </div>
+          <div><div class="kpi-value" id="kpi-engraving">—</div><div class="kpi-label">הזמנות עם חריטה</div></div>
+        </div>
+      </div>
+
+      <!-- Two-column row -->
+      <div style="display:grid;grid-template-columns:1fr 320px;gap:1rem;align-items:start">
+
+        <!-- Recent orders table -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">הזמנות אחרונות</span>
+            <a href="./orders.html" class="btn btn-ghost btn-sm">כל ההזמנות</a>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>מספר הזמנה</th>
+                  <th>לקוח</th>
+                  <th>סכום</th>
+                  <th>סטטוס</th>
+                  <th>חריטה</th>
+                  <th>תאריך</th>
+                </tr>
+              </thead>
+              <tbody id="recent-orders-body">
+                <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:2rem">טוען...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Quick stats card -->
+        <div style="display:flex;flex-direction:column;gap:1rem">
+          <div class="card">
+            <div class="card-header"><span class="card-title">סטטוס מלאי</span></div>
+            <div class="card-body" id="stock-body" style="padding:1rem">
+              <p style="color:var(--text-muted);font-size:0.8rem">טוען...</p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">הזמנות לפי סטטוס</span></div>
+            <div class="card-body" id="status-breakdown" style="padding:1rem">
+              <p style="color:var(--text-muted);font-size:0.8rem">טוען...</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="./admin.js"></script>
+<script>
+requireAuth().then(loadDashboard);
+
+async function loadDashboard() {
+  try {
+    const s = await api('GET', '/admin/dashboard/stats');
+
+    // KPIs
+    document.getElementById('kpi-revenue').textContent   = fmtMoney(s.revenue);
+    document.getElementById('kpi-orders').textContent    = s.totalOrders;
+    document.getElementById('kpi-pending').textContent   = s.pendingOrders;
+    document.getElementById('kpi-engraving').textContent = s.engravingOrders;
+    document.getElementById('sb-pending').textContent    = s.pendingOrders;
+
+    // Recent orders
+    const tbody = document.getElementById('recent-orders-body');
+    if (!s.recentOrders.length) {
+      tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><p>אין הזמנות עדיין</p></div></td></tr>`;
+    } else {
+      tbody.innerHTML = s.recentOrders.map(o => `
+        <tr>
+          <td><strong>${o.order_number}</strong></td>
+          <td>${o.customer_name}</td>
+          <td>${fmtMoney(o.total_amount)}</td>
+          <td>${statusBadge(o.status)}</td>
+          <td>${o.has_engraving ? '<span class="badge badge-engraving">✏️ חריטה</span>' : '<span style="color:var(--text-muted);font-size:0.8rem">—</span>'}</td>
+          <td style="color:var(--text-muted);font-size:0.8rem">${fmtDate(o.created_at)}</td>
+        </tr>`).join('');
+    }
+
+    // Stock card
+    const stockEl = document.getElementById('stock-body');
+    stockEl.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:0.6rem">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:0.82rem">סה"כ מוצרים</span>
+          <strong>${s.totalProducts}</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:0.82rem">מלאי נמוך (&lt;5)</span>
+          <span class="badge ${s.lowStock > 0 ? 'badge-low' : 'badge-completed'}">${s.lowStock}</span>
+        </div>
+      </div>`;
+
+    // Status breakdown
+    const statusBreakEl = document.getElementById('status-breakdown');
+    const statuses = [
+      { key: 'pending',       label: 'ממתינות' },
+      { key: 'in_production', label: 'בייצור'  },
+      { key: 'shipped',       label: 'נשלחו'   },
+      { key: 'completed',     label: 'הושלמו'  },
+    ];
+    statusBreakEl.innerHTML = statuses.map(st => {
+      const count = s.recentOrders.filter(o => o.status === st.key).length;
+      return `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
+        <span style="font-size:0.82rem">${st.label}</span>
+        ${statusBadge(st.key).replace('>', `>${count} `)}
+      </div>`;
+    }).join('');
+
+  } catch (e) {
+    toastErr(e.message);
+  }
+}
+</script>
+</body>
+</html>

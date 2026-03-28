@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>כניסה – Olives Admin</title>
+  <link rel="stylesheet" href="./admin.css">
+</head>
+<body class="login-page">
+
+  <div class="login-card">
+    <div class="login-logo">
+      <span class="login-logo-name">OLIVES</span>
+      <div class="login-logo-sub">Admin Panel</div>
+    </div>
+
+    <h1 class="login-title">כניסה לניהול</h1>
+
+    <div class="login-error" id="login-error"></div>
+
+    <form id="login-form" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="username">שם משתמש <span class="req">*</span></label>
+        <input id="username" name="username" type="text" class="form-control"
+               placeholder="admin" autocomplete="username" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">סיסמה <span class="req">*</span></label>
+        <input id="password" name="password" type="password" class="form-control"
+               placeholder="••••••••" autocomplete="current-password" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-login" id="submit-btn">
+        כניסה
+      </button>
+    </form>
+
+    <p class="login-hint">Olives Jewelry &copy; 2026</p>
+  </div>
+
+  <script src="./admin.js"></script>
+  <script>
+    // If already logged in → go to dashboard
+    if (getToken()) {
+      api('GET', '/admin/auth/verify')
+        .then(r => { if (r.valid) window.location.href = './dashboard.html'; })
+        .catch(() => clearAuth());
+    }
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errEl  = document.getElementById('login-error');
+      const btn    = document.getElementById('submit-btn');
+      const usernameVal = document.getElementById('username').value.trim();
+      const passwordVal = document.getElementById('password').value;
+
+      errEl.classList.remove('show');
+      btn.textContent = 'מתחבר...';
+      btn.disabled = true;
+
+      try {
+        const { token, username } = await fetch(`${API}/admin/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: usernameVal, password: passwordVal })
+        }).then(async r => {
+          const j = await r.json();
+          if (!r.ok) throw new Error(j.error);
+          return j;
+        });
+
+        setToken(token);
+        localStorage.setItem('admin_user', username);
+        window.location.href = './dashboard.html';
+
+      } catch (err) {
+        errEl.textContent = err.message || 'שגיאה בכניסה';
+        errEl.classList.add('show');
+        btn.textContent = 'כניסה';
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

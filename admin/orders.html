@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>הזמנות – Olives Admin</title>
+  <link rel="stylesheet" href="./admin.css">
+</head>
+<body>
+<div class="admin-layout">
+
+  <!-- ── Sidebar ─────────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <span class="brand-name">OLIVES</span>
+      <span class="brand-sub">Admin Panel</span>
+    </div>
+    <nav class="sidebar-nav">
+      <span class="nav-section-title">ראשי</span>
+      <a href="./dashboard.html" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <span class="nav-section-title">קטלוג</span>
+      <a href="./products.html" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+        מוצרים
+      </a>
+      <span class="nav-section-title">מכירות</span>
+      <a href="./orders.html" class="nav-link active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/></svg>
+        הזמנות
+      </a>
+    </nav>
+    <div class="sidebar-footer">Olives Jewelry &copy; 2026</div>
+  </aside>
+
+  <!-- ── Main ───────────────────────────────────────────── -->
+  <div class="main-content">
+    <header class="topbar">
+      <span class="topbar-title">ניהול הזמנות</span>
+      <div class="topbar-right">
+        <div class="topbar-user">
+          <div class="avatar">A</div>
+          <span id="admin-username">admin</span>
+        </div>
+        <button class="btn-logout" onclick="logout()">יציאה</button>
+      </div>
+    </header>
+
+    <main class="page-content">
+      <div class="page-header">
+        <div>
+          <h1>הזמנות</h1>
+          <p>מעקב, עדכון סטטוס ופרטי חריטה לכל הזמנה</p>
+        </div>
+        <!-- Quick engraving filter button -->
+        <button class="btn btn-accent" id="btn-eng-filter" onclick="filterEngravingOnly()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          רק חריטות לביצוע
+        </button>
+      </div>
+
+      <div class="card">
+        <!-- Filter bar -->
+        <div class="filter-bar">
+          <input type="search" class="filter-input search" id="f-search" placeholder="🔍 שם לקוח / מספר הזמנה...">
+          <div class="filter-sep"></div>
+          <select class="filter-input" id="f-status">
+            <option value="">כל הסטטוסים</option>
+            <option value="pending">ממתינה</option>
+            <option value="in_production">בייצור</option>
+            <option value="shipped">נשלחה</option>
+            <option value="completed">הושלמה</option>
+            <option value="cancelled">בוטלה</option>
+          </select>
+          <select class="filter-input" id="f-engraving">
+            <option value="">חריטה – הכל</option>
+            <option value="true">עם חריטה</option>
+            <option value="false">ללא חריטה</option>
+          </select>
+          <div class="filter-sep"></div>
+          <button class="btn btn-ghost btn-sm" onclick="clearFilters()">נקה</button>
+        </div>
+
+        <!-- Summary chips -->
+        <div id="filter-summary" style="padding:0.6rem 1.25rem;border-bottom:1px solid var(--border);display:none;gap:0.5rem;flex-wrap:wrap;background:#FAFAF7">
+        </div>
+
+        <!-- Table -->
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>מספר הזמנה</th>
+                <th>לקוח</th>
+                <th>פרטי קשר</th>
+                <th>סכום</th>
+                <th>סטטוס</th>
+                <th>חריטה</th>
+                <th>תאריך</th>
+                <th>פעולות</th>
+              </tr>
+            </thead>
+            <tbody id="orders-body">
+              <tr><td colspan="8" style="text-align:center;padding:2.5rem;color:var(--text-muted)">טוען...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     ORDER DETAIL MODAL
+══════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="order-modal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <span class="modal-title" id="order-modal-title">פרטי הזמנה</span>
+      <button class="modal-close" onclick="closeModal('order-modal')">&times;</button>
+    </div>
+    <div class="modal-body" id="order-modal-body">
+      <p style="color:var(--text-muted)">טוען...</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('order-modal')">סגור</button>
+    </div>
+  </div>
+</div>
+
+<script src="./admin.js"></script>
+<script>
+requireAuth().then(loadOrders);
+
+// ── Live filters ─────────────────────────────────────────────
+['f-search','f-status','f-engraving'].forEach(id =>
+  document.getElementById(id).addEventListener('input', loadOrders)
+);
+
+let engravingOnlyMode = false;
+
+function filterEngravingOnly() {
+  engravingOnlyMode = !engravingOnlyMode;
+  const btn = document.getElementById('btn-eng-filter');
+  document.getElementById('f-engraving').value = engravingOnlyMode ? 'true' : '';
+  btn.style.background = engravingOnlyMode ? 'var(--sidebar-bg)' : '';
+  document.getElementById('f-status').value = engravingOnlyMode ? 'in_production' : '';
+  loadOrders();
+}
+
+function clearFilters() {
+  ['f-search','f-status','f-engraving'].forEach(id => document.getElementById(id).value = '');
+  engravingOnlyMode = false;
+  document.getElementById('btn-eng-filter').style.background = '';
+  loadOrders();
+}
+
+// ── Load orders ───────────────────────────────────────────────
+async function loadOrders() {
+  const params = new URLSearchParams();
+  const search    = document.getElementById('f-search').value;
+  const status    = document.getElementById('f-status').value;
+  const engraving = document.getElementById('f-engraving').value;
+
+  if (search)    params.set('search', search);
+  if (status)    params.set('status', status);
+  if (engraving) params.set('has_engraving', engraving);
+
+  // Show/hide filter summary
+  const summaryEl = document.getElementById('filter-summary');
+  const chips = [];
+  if (status)    chips.push(`<span class="badge badge-${status}" style="font-size:.75rem">${STATUS[status]?.label}</span>`);
+  if (engraving === 'true')  chips.push(`<span class="badge badge-engraving">✏️ עם חריטה</span>`);
+  if (engraving === 'false') chips.push(`<span class="badge" style="background:#F5F5F5">ללא חריטה</span>`);
+  if (chips.length) {
+    summaryEl.style.display = 'flex';
+    summaryEl.innerHTML = '<span style="font-size:.75rem;color:var(--text-muted);align-self:center">מסנן:</span>' + chips.join('');
+  } else {
+    summaryEl.style.display = 'none';
+  }
+
+  try {
+    const orders = await api('GET', '/admin/orders?' + params);
+    renderOrders(orders);
+  } catch (e) { toastErr(e.message); }
+}
+
+function renderOrders(list) {
+  const tbody = document.getElementById('orders-body');
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/></svg>
+      <p>לא נמצאו הזמנות</p></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map(o => {
+    const engCell = o.has_engraving
+      ? `<span class="badge badge-engraving">✏️ חריטה</span>`
+      : `<span style="color:var(--text-muted);font-size:.8rem">—</span>`;
+
+    return `<tr style="${o.has_engraving ? 'background:rgba(59,64,42,0.02)' : ''}">
+      <td><strong style="font-size:.88rem">${o.order_number}</strong></td>
+      <td>${o.customer_name}</td>
+      <td style="font-size:.78rem;color:var(--text-muted)">
+        ${o.customer_email}<br>${o.customer_phone || ''}
+      </td>
+      <td><strong>${fmtMoney(o.total_amount)}</strong></td>
+      <td>
+        <select class="status-select" onchange="updateStatus(${o.id}, this.value, this)">
+          ${['pending','in_production','shipped','completed','cancelled'].map(s =>
+            `<option value="${s}" ${s === o.status ? 'selected' : ''}>${STATUS[s].label}</option>`
+          ).join('')}
+        </select>
+      </td>
+      <td>${engCell}</td>
+      <td style="font-size:.78rem;color:var(--text-muted);white-space:nowrap">${fmtDate(o.created_at)}</td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="openOrderDetail(${o.id})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          פרטים
+        </button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Update status inline ──────────────────────────────────────
+async function updateStatus(id, status, selectEl) {
+  const prev = selectEl.dataset.prev || selectEl.value;
+  try {
+    await api('PATCH', `/admin/orders/${id}/status`, { status });
+    selectEl.dataset.prev = status;
+    toastOk(`סטטוס עודכן → ${STATUS[status].label}`);
+    // Re-render row background for engraving
+    loadOrders();
+  } catch (e) {
+    toastErr(e.message);
+    selectEl.value = prev;
+  }
+}
+
+// ── Order detail modal ────────────────────────────────────────
+async function openOrderDetail(id) {
+  document.getElementById('order-modal-body').innerHTML = '<p style="color:var(--text-muted);padding:1rem">טוען...</p>';
+  openModal('order-modal');
+
+  try {
+    const o = await api('GET', `/admin/orders/${id}`);
+    document.getElementById('order-modal-title').textContent = `הזמנה ${o.order_number}`;
+    document.getElementById('order-modal-body').innerHTML = buildOrderHTML(o);
+  } catch (e) {
+    toastErr(e.message);
+    closeModal('order-modal');
+  }
+}
+
+function buildOrderHTML(o) {
+  const statusOptions = ['pending','in_production','shipped','completed','cancelled'].map(s =>
+    `<option value="${s}" ${s === o.status ? 'selected' : ''}>${STATUS[s].label}</option>`
+  ).join('');
+
+  const itemsHTML = (o.items || []).map(item => {
+    const engBlock = item.engraving_text ? `
+      <div class="eng-highlight">
+        <div class="eng-highlight-title">✏️ טקסט לחריטה</div>
+        <div class="eng-highlight-text">${item.engraving_text}</div>
+        <div class="eng-highlight-font">
+          פונט: <strong>${item.engraving_font || '—'}</strong>
+          ${item.engraving_price > 0 ? ` &nbsp;|&nbsp; תוספת: ${fmtMoney(item.engraving_price)}` : ''}
+        </div>
+      </div>` : '';
+
+    return `<div class="order-item-row">
+      <img src="${item.image_url || ''}" class="order-item-img"
+           onerror="this.style.background='#EDE5DE';this.src=''">
+      <div class="order-item-info">
+        <div class="order-item-name">${item.product_name}</div>
+        <div class="order-item-price">
+          כמות: ${item.quantity} &nbsp;|&nbsp; מחיר: ${fmtMoney(item.unit_price)}
+        </div>
+        ${engBlock}
+      </div>
+    </div>`;
+  }).join('');
+
+  return `
+    <!-- Meta -->
+    <div class="order-meta-grid">
+      <div class="order-meta-item">
+        <div class="order-meta-label">לקוח</div>
+        <div class="order-meta-value">${o.customer_name}</div>
+      </div>
+      <div class="order-meta-item">
+        <div class="order-meta-label">טלפון</div>
+        <div class="order-meta-value">${o.customer_phone || '—'}</div>
+      </div>
+      <div class="order-meta-item">
+        <div class="order-meta-label">אימייל</div>
+        <div class="order-meta-value" style="font-size:.85rem">${o.customer_email}</div>
+      </div>
+      <div class="order-meta-item">
+        <div class="order-meta-label">תאריך</div>
+        <div class="order-meta-value">${fmtDate(o.created_at)}</div>
+      </div>
+      <div class="order-meta-item">
+        <div class="order-meta-label">סכום כולל</div>
+        <div class="order-meta-value" style="color:var(--sidebar-bg);font-size:1.1rem">${fmtMoney(o.total_amount)}</div>
+      </div>
+      <div class="order-meta-item">
+        <div class="order-meta-label">סטטוס</div>
+        <div style="margin-top:4px">
+          <select class="status-select" style="font-size:.85rem"
+            onchange="updateStatus(${o.id}, this.value, this); this.closest('.modal-overlay').classList.remove('open'); loadOrders();">
+            ${statusOptions}
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Engraving alert banner (if order has engraving) -->
+    ${o.has_engraving ? `
+    <div style="background:rgba(59,64,42,0.06);border:1px solid rgba(59,64,42,0.2);border-radius:8px;padding:.75rem 1rem;margin-bottom:1rem;display:flex;align-items:center;gap:.6rem">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--sidebar-bg)" stroke-width="2" style="width:18px;height:18px;flex-shrink:0"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      <span style="font-size:.82rem;font-weight:600;color:var(--sidebar-bg)">הזמנה זו מכילה פריטים עם חריטה אישית — ראה פרטים למטה</span>
+    </div>` : ''}
+
+    <!-- Items -->
+    <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden">
+      <div style="padding:.75rem 1rem;background:#FAFAF7;border-bottom:1px solid var(--border);font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted)">
+        פריטים בהזמנה
+      </div>
+      <div style="padding:0 1rem">
+        ${itemsHTML || '<p style="padding:1rem;color:var(--text-muted);font-size:.85rem">אין פריטים</p>'}
+      </div>
+    </div>`;
+}
+</script>
+</body>
+</html>
