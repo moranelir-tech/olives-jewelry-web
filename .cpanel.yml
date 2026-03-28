@@ -2,8 +2,8 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/$USER/olives-jewelry/
-    - find $DEPLOYPATH -maxdepth 1 -name "*.html" -delete
-    - find $DEPLOYPATH -maxdepth 1 -name "*.css" -delete
+    - rm -f $DEPLOYPATH/index.html $DEPLOYPATH/shop.html $DEPLOYPATH/product.html $DEPLOYPATH/category.html $DEPLOYPATH/cart.html $DEPLOYPATH/style.css $DEPLOYPATH/server.js $DEPLOYPATH/database.js $DEPLOYPATH/package.json $DEPLOYPATH/package-lock.json $DEPLOYPATH/.gitignore
+    - rm -rf $DEPLOYPATH/admin
     - /bin/cp -r . $DEPLOYPATH
     - export PATH=/home/$USER/nodevenv/olives-jewelry/20/bin:$PATH
     - cd $DEPLOYPATH && npm install --production
