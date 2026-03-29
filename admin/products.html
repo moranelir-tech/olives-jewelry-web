@@ -209,7 +209,7 @@
         <!-- ─── תמונות משנה ───────────────────────────── -->
         <div style="border-top:1px solid var(--border);padding-top:1.1rem;margin-top:0.75rem">
           <div style="font-weight:600;font-size:0.85rem;margin-bottom:0.5rem;color:var(--text)">תמונות משנה</div>
-          <div class="form-hint" style="margin-bottom:0.75rem">התמונות נשמרות בשרת לאחר שמירת המוצר</div>
+          <div class="form-hint" id="secondary-images-hint" style="margin-bottom:0.75rem">התמונות יועלו לשרת לאחר שמירת המוצר</div>
           <div id="secondary-images-grid" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.75rem"></div>
           <div style="display:flex;gap:0.5rem;align-items:center">
             <input type="file" id="secondary-img-input" accept="image/*" style="display:none" onchange="handleSecondaryImageUpload(this)">
@@ -503,6 +503,7 @@ function openAddModal() {
   renderColorVariants([]);
   renderSecondaryImages([]);
   window._pendingSecondaryFiles = [];
+  document.getElementById('secondary-images-hint').textContent = 'התמונות יועלו לשרת לאחר שמירת המוצר';
   openModal('product-modal');
 }
 
@@ -530,6 +531,7 @@ async function openEditModal(id) {
 
     // Secondary images
     renderSecondaryImages(p.secondary_images || []);
+    document.getElementById('secondary-images-hint').textContent = 'לחץ על הכפתור להעלאה — התמונה מועלית מיד לשרת';
     previewFromUrl(p.image_url);
 
     resetEngravingFields();
