@@ -19,6 +19,13 @@ app.use(express.static(path.join(__dirname)));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/admin',   express.static(path.join(__dirname, 'admin')));
 
+// ── Debug ──────────────────────────────────────────────────
+const fs = require('fs');
+app.get('/api/debug', (req, res) => {
+  const files = fs.readdirSync(__dirname);
+  res.json({ __dirname, cwd: process.cwd(), files });
+});
+
 // ── Multer – העלאת תמונות ──────────────────────────────────
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, path.join(__dirname, 'uploads')),
