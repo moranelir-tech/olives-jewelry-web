@@ -212,10 +212,10 @@
           <div class="form-hint" id="secondary-images-hint" style="margin-bottom:0.75rem">התמונות יועלו לשרת לאחר שמירת המוצר</div>
           <div id="secondary-images-grid" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.75rem"></div>
           <div style="display:flex;gap:0.5rem;align-items:center">
-            <input type="file" id="secondary-img-input" accept="image/*" style="display:none" onchange="handleSecondaryImageUpload(this)">
+            <input type="file" id="secondary-img-input" accept="image/*" multiple style="display:none" onchange="handleSecondaryImageUpload(this)">
             <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('secondary-img-input').click()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              העלה תמונת משנה
+              העלה תמונות משנה
             </button>
             <span id="secondary-upload-status" style="font-size:0.78rem;color:var(--text-muted)"></span>
           </div>
@@ -230,7 +230,7 @@
               <input type="checkbox" id="f-engravable" onchange="toggleEngravingFields(this.checked)">
               <span class="toggle-slider"></span>
             </label>
-            <span class="toggle-label-text" style="font-weight:600">המוצר ניתן לחריטה</span>
+            <span class="toggle-label-text" style="font-weight:600">טקסט לחריטה</span>
           </div>
         </div>
 
@@ -266,16 +266,14 @@
                 <span class="font-tag" data-font="Bold"    onclick="toggleFont(this,'front')">Bold</span>
               </div>
             </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">מגבלת תווים (טקסט)</label>
-                <input id="f-front-maxchars" type="number" class="form-control" placeholder="20" min="1" max="100">
-              </div>
-              <div class="form-group">
-                <label class="form-label">תוספת מחיר חריטה קדמית (₪)</label>
-                <input id="f-front-price" type="number" class="form-control" placeholder="0" min="0" step="1">
-                <div class="form-hint">0 = חריטה חינם</div>
-              </div>
+            <div class="form-group">
+              <label class="form-label">מגבלת תווים (טקסט)</label>
+              <input id="f-front-maxchars" type="number" class="form-control" placeholder="20" min="1" max="100">
+            </div>
+            <div class="form-group">
+              <label class="form-label">תוספת מחיר חריטה קדמית (₪)</label>
+              <input id="f-front-price" type="number" class="form-control" placeholder="0" min="0" step="1">
+              <div class="form-hint">0 = חריטה חינם</div>
             </div>
           </div>
 
@@ -286,7 +284,7 @@
                 <input type="checkbox" id="f-back-enabled" onchange="toggleBackSide(this.checked)">
                 <span class="toggle-slider"></span>
               </label>
-              <span class="toggle-label-text">ניתן לחריטה גם בצד אחורי</span>
+              <span class="toggle-label-text">חריטה בצד השני?</span>
             </div>
           </div>
 
@@ -316,16 +314,14 @@
               </div>
             </div>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">מגבלת תווים (אחורי)</label>
-                <input id="f-back-maxchars" type="number" class="form-control" placeholder="15" min="1" max="100">
-              </div>
-              <div class="form-group">
-                <label class="form-label">תוספת מחיר צד אחורי (₪)</label>
-                <input id="f-back-price" type="number" class="form-control" placeholder="50" min="0" step="1">
-                <div class="form-hint">מחיר נוסף לחריטה אחורית</div>
-              </div>
+            <div class="form-group">
+              <label class="form-label">מגבלת תווים (אחורי)</label>
+              <input id="f-back-maxchars" type="number" class="form-control" placeholder="15" min="1" max="100">
+            </div>
+            <div class="form-group">
+              <label class="form-label">תוספת מחיר צד אחורי (₪)</label>
+              <input id="f-back-price" type="number" class="form-control" placeholder="50" min="0" step="1">
+              <div class="form-hint">מחיר נוסף לחריטה אחורית</div>
             </div>
           </div>
 
@@ -349,16 +345,14 @@
               <div class="form-hint">הטקסט שיופיע מעל כל שדה הזנה ללקוח</div>
             </div>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">מספר שמות מקסימלי</label>
-                <input id="f-max-names" type="number" class="form-control" placeholder="5" min="2" max="20">
-              </div>
-              <div class="form-group">
-                <label class="form-label">מחיר לכל שם נוסף (₪)</label>
-                <input id="f-name-price" type="number" class="form-control" placeholder="30" min="0" step="1">
-                <div class="form-hint">יתווסף לסל לכל שם שהוזן</div>
-              </div>
+            <div class="form-group">
+              <label class="form-label">מספר שמות מקסימלי</label>
+              <input id="f-max-names" type="number" class="form-control" placeholder="5" min="2" max="20">
+            </div>
+            <div class="form-group">
+              <label class="form-label">מחיר לכל שם נוסף (₪)</label>
+              <input id="f-name-price" type="number" class="form-control" placeholder="30" min="0" step="1">
+              <div class="form-hint">יתווסף לסל לכל שם שהוזן</div>
             </div>
 
             <!-- תצוגה מקדימה של עלות -->
@@ -866,43 +860,47 @@ function renderSecondaryImages(urls) {
 
 function handleSecondaryImageUpload(input) {
   if (!input.files.length) return;
-  const file = input.files[0];
+  const files = Array.from(input.files);
   const editId = document.getElementById('edit-id').value;
 
   if (editId) {
     // Product already exists – upload immediately
     const statusEl = document.getElementById('secondary-upload-status');
-    statusEl.textContent = 'מעלה...';
-    const fd    = new FormData();
-    fd.append('image', file);
+    statusEl.textContent = `מעלה ${files.length} תמונות...`;
     const token = localStorage.getItem('admin_token');
-    fetch(`/admin/products/${editId}/secondary-image`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}` },
-      body: fd
-    })
-    .then(r => r.json())
-    .then(data => {
-      statusEl.textContent = '';
-      renderSecondaryImages(data.secondary_images || []);
-    })
-    .catch(() => { statusEl.textContent = 'שגיאה בהעלאה'; });
+    let lastData = null;
+    const uploads = files.map(file => {
+      const fd = new FormData();
+      fd.append('image', file);
+      return fetch(`/admin/products/${editId}/secondary-image`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: fd
+      }).then(r => r.json()).then(data => { lastData = data; });
+    });
+    Promise.all(uploads)
+      .then(() => {
+        statusEl.textContent = '';
+        renderSecondaryImages(lastData?.secondary_images || []);
+      })
+      .catch(() => { statusEl.textContent = 'שגיאה בהעלאה'; });
   } else {
-    // New product – queue file for upload after save
+    // New product – queue files for upload after save
     if (!window._pendingSecondaryFiles) window._pendingSecondaryFiles = [];
-    window._pendingSecondaryFiles.push(file);
-    // Show local preview
-    const reader = new FileReader();
-    reader.onload = e => {
-      const grid = document.getElementById('secondary-images-grid');
-      const existing = grid.innerHTML.includes('אין תמונות') ? '' : grid.innerHTML;
-      grid.innerHTML = existing + `
-        <div style="position:relative;display:inline-block">
-          <img src="${e.target.result}" style="width:72px;height:72px;object-fit:cover;border-radius:6px;border:2px dashed var(--border)">
-          <span style="position:absolute;bottom:2px;right:2px;background:rgba(0,0,0,0.5);color:#fff;font-size:9px;border-radius:3px;padding:1px 3px">ממתין</span>
-        </div>`;
-    };
-    reader.readAsDataURL(file);
+    files.forEach(file => {
+      window._pendingSecondaryFiles.push(file);
+      const reader = new FileReader();
+      reader.onload = e => {
+        const grid = document.getElementById('secondary-images-grid');
+        const existing = grid.innerHTML.includes('אין תמונות') ? '' : grid.innerHTML;
+        grid.innerHTML = existing + `
+          <div style="position:relative;display:inline-block">
+            <img src="${e.target.result}" style="width:72px;height:72px;object-fit:cover;border-radius:6px;border:2px dashed var(--border)">
+            <span style="position:absolute;bottom:2px;right:2px;background:rgba(0,0,0,0.5);color:#fff;font-size:9px;border-radius:3px;padding:1px 3px">ממתין</span>
+          </div>`;
+      };
+      reader.readAsDataURL(file);
+    });
   }
   input.value = '';
 }
