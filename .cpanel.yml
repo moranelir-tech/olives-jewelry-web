@@ -1,20 +1,17 @@
 ---
 deployment:
   tasks:
-    - BASE="https://raw.githubusercontent.com/moranelir-tech/olives-jewelry-web/main" && DIR="/home/olivesje/olives-jewelry"
-    - curl -s "$BASE/index.html" -o "$DIR/index.html"
-    - curl -s "$BASE/shop.html" -o "$DIR/shop.html"
-    - curl -s "$BASE/product.html" -o "$DIR/product.html"
-    - curl -s "$BASE/category.html" -o "$DIR/category.html"
-    - curl -s "$BASE/cart.html" -o "$DIR/cart.html"
-    - curl -s "$BASE/style.css" -o "$DIR/style.css"
-    - curl -s "$BASE/server.js" -o "$DIR/server.js"
-    - curl -s "$BASE/database.js" -o "$DIR/database.js"
-    - curl -s "$BASE/admin/login.html" -o "$DIR/admin/login.html"
-    - curl -s "$BASE/admin/dashboard.html" -o "$DIR/admin/dashboard.html"
-    - curl -s "$BASE/admin/products.html" -o "$DIR/admin/products.html"
-    - curl -s "$BASE/admin/orders.html" -o "$DIR/admin/orders.html"
-    - curl -s "$BASE/admin/admin.css" -o "$DIR/admin/admin.css"
-    - curl -s "$BASE/admin/admin.js" -o "$DIR/admin/admin.js"
-    - export PATH=/home/olivesje/nodevenv/olives-jewelry/20/bin:$PATH
-    - cd /home/olivesje/olives-jewelry && npm install --production
+    - curl -sf "https://raw.githubusercontent.com/moranelir-tech/olives-jewelry-web/main/index.html" -o "/home/olivesje/olives-jewelry/index.html"
+    - curl -sf "https://raw.githubusercontent.com/moranelir-tech/olives-jewelry-web/main/shop.html" -o "/home/olivesje/olives-jewelry/shop.html"
+    - curl -sf "https://raw.githubusercontent.com/moranelir-tech/olives-jewelry-web/main/product.html" -o "/home/olivesje/olives-jewelry/product.html"
+    - curl -sf "https://raw.githubusercontent.com/moranelir-tech/olives-jewelry-web/main/category.html" -o "/home/olivesje/olives-jewelry/category.html"
+    - curl -sf "https://raw.githubusercontent.com/moranelir-tech/olives-jewelry-web/main/cart.html" -o "/home/olivesje/olives-jewelry/cart.html"
+    - curl -sf "https://raw.githubusercontent.com/moranelir-tech/olives-jewelry-web/main/style.css" -o "/home/olivesje/olives-jewelry/style.css"
+    - curl -sf "https://raw.githubusercontent.com/moranelir-tech/olives-jewelry-web/main/server.js" -o "/home/olivesje/olives-jewelry/server.js"
+    - curl -sf "https://raw.githubusercontent.com/moranelir-tech/olives-jewelry-web/main/database.js" -o "/home/olivesje/olives-jewelry/database.js"
+    - curl -sf "https://raw.githubusercontent.com/moranelir-tech/olives-jewelry-web/main/admin/login.html" -o "/home/olivesje/olives-jewelry/admin/login.html"
+    - curl -sf "https://raw.githubusercontent.com/moranelir-tech/olives-jewelry-web/main/admin/dashboard.html" -o "/home/olivesje/olives-jewelry/admin/dashboard.html"
+    - curl -sf "https://raw.githubusercontent.com/moranelir-tech/olives-jewelry-web/main/admin/products.html" -o "/home/olivesje/olives-jewelry/admin/products.html"
+    - curl -sf "https://raw.githubusercontent.com/moranelir-tech/olives-jewelry-web/main/admin/admin.css" -o "/home/olivesje/olives-jewelry/admin/admin.css"
+    - curl -sf "https://raw.githubusercontent.com/moranelir-tech/olives-jewelry-web/main/admin/admin.js" -o "/home/olivesje/olives-jewelry/admin/admin.js"
+    - export PATH=/home/olivesje/nodevenv/olives-jewelry/20/bin:$PATH && cd /home/olivesje/olives-jewelry && npm install --production
