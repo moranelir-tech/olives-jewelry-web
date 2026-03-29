@@ -174,7 +174,7 @@
         <!-- ─── פרטי תצוגה ───────────────────────────── -->
         <div style="border-top:1px solid var(--border);padding-top:1.1rem;margin-top:0.75rem">
           <div style="font-weight:600;font-size:0.85rem;margin-bottom:0.85rem;color:var(--text)">
-            פרטי מוצר לתצוגה (חומר · עמידות · משלוח)
+            פרטי מוצר לתצוגה
           </div>
           <div class="form-row">
             <div class="form-group">
@@ -182,19 +182,42 @@
               <input id="f-material" type="text" class="form-control" placeholder="זהב 18K / כסף 925">
             </div>
             <div class="form-group">
-              <label class="form-label">עמידות</label>
-              <input id="f-waterproof" type="text" class="form-control" placeholder="עמיד במים">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">משלוח</label>
-              <input id="f-shipping" type="text" class="form-control" placeholder="2–4 ימי עסקים">
-            </div>
-            <div class="form-group">
               <label class="form-label">הערת חריטה (מוצג רק אם ניתן לחריטה)</label>
               <input id="f-engraving-note" type="text" class="form-control" placeholder="עבודת יד אישית">
             </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">מידות המוצר</label>
+            <input id="f-dimensions" type="text" class="form-control" placeholder="לדוגמה: אורך 16-18 ס״מ, רוחב 1.2 ס״מ">
+          </div>
+        </div>
+
+        <!-- ─── וריאציות צבע ──────────────────────────── -->
+        <div style="border-top:1px solid var(--border);padding-top:1.1rem;margin-top:0.75rem">
+          <div style="font-weight:600;font-size:0.85rem;margin-bottom:0.85rem;color:var(--text)">וריאציות צבע</div>
+          <input type="hidden" id="input-color-variants" value="[]">
+          <div id="color-variants-list" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.75rem"></div>
+          <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
+            <input type="color" id="cv-color-picker" value="#FFD700"
+                   style="width:38px;height:38px;border:1px solid var(--border);border-radius:6px;padding:2px;cursor:pointer;background:none">
+            <input type="text" id="cv-name-input" class="form-control" placeholder="שם הצבע (לדוגמה: זהב)"
+                   style="flex:1;min-width:120px">
+            <button type="button" class="btn btn-ghost btn-sm" onclick="addColorVariant()" style="white-space:nowrap">+ הוסף צבע</button>
+          </div>
+        </div>
+
+        <!-- ─── תמונות משנה ───────────────────────────── -->
+        <div style="border-top:1px solid var(--border);padding-top:1.1rem;margin-top:0.75rem">
+          <div style="font-weight:600;font-size:0.85rem;margin-bottom:0.5rem;color:var(--text)">תמונות משנה</div>
+          <div class="form-hint" style="margin-bottom:0.75rem">התמונות נשמרות בשרת לאחר שמירת המוצר</div>
+          <div id="secondary-images-grid" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.75rem"></div>
+          <div style="display:flex;gap:0.5rem;align-items:center">
+            <input type="file" id="secondary-img-input" accept="image/*" style="display:none" onchange="handleSecondaryImageUpload(this)">
+            <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('secondary-img-input').click()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              העלה תמונת משנה
+            </button>
+            <span id="secondary-upload-status" style="font-size:0.78rem;color:var(--text-muted)"></span>
           </div>
         </div>
 
@@ -474,6 +497,12 @@ function openAddModal() {
   document.getElementById('edit-id').value = '';
   resetEngravingFields();
   resetImagePreview();
+  // Reset new fields
+  document.getElementById('f-dimensions').value = '';
+  document.getElementById('input-color-variants').value = '[]';
+  renderColorVariants([]);
+  renderSecondaryImages([]);
+  window._pendingSecondaryFiles = [];
   openModal('product-modal');
 }
 
@@ -490,10 +519,17 @@ async function openEditModal(id) {
     document.getElementById('f-cat').value    = p.category;
     document.getElementById('f-image').value        = p.image_url || '';
     document.getElementById('f-slug').value          = p.slug || '';
-    document.getElementById('f-material').value      = p.details_material   || '';
-    document.getElementById('f-waterproof').value    = p.details_waterproof || '';
-    document.getElementById('f-shipping').value      = p.details_shipping   || '';
-    document.getElementById('f-engraving-note').value= p.details_engraving  || '';
+    document.getElementById('f-material').value       = p.details_material  || '';
+    document.getElementById('f-engraving-note').value = p.details_engraving || '';
+    document.getElementById('f-dimensions').value     = p.dimensions        || '';
+
+    // Color variants
+    const cvRaw = p.color_variants || [];
+    document.getElementById('input-color-variants').value = JSON.stringify(cvRaw);
+    renderColorVariants(cvRaw);
+
+    // Secondary images
+    renderSecondaryImages(p.secondary_images || []);
     previewFromUrl(p.image_url);
 
     resetEngravingFields();
@@ -626,9 +662,9 @@ async function saveProduct() {
     category:           document.getElementById('f-cat').value,
     stock_quantity:     document.getElementById('f-stock').value || 0,
     details_material:   document.getElementById('f-material').value.trim(),
-    details_waterproof: document.getElementById('f-waterproof').value.trim(),
-    details_shipping:   document.getElementById('f-shipping').value.trim(),
     details_engraving:  document.getElementById('f-engraving-note').value.trim(),
+    dimensions:         document.getElementById('f-dimensions').value.trim(),
+    color_variants:     JSON.parse(document.getElementById('input-color-variants').value || '[]'),
     is_engravable:      isEngravable,
     engraving_settings
   };
@@ -648,7 +684,7 @@ async function saveProduct() {
       productId = res.id;
     }
 
-    // Upload image if file was selected
+    // Upload main image if file was selected
     const fileInput = document.getElementById('img-file-input');
     if (fileInput.files.length && productId) {
       const fd = new FormData();
@@ -660,6 +696,23 @@ async function saveProduct() {
         body: fd
       });
       if (!r.ok) throw new Error('שגיאה בהעלאת התמונה');
+    }
+
+    // Upload pending secondary images
+    const pendingSecondary = window._pendingSecondaryFiles || [];
+    if (pendingSecondary.length && productId) {
+      const token = localStorage.getItem('admin_token');
+      for (const file of pendingSecondary) {
+        const fd = new FormData();
+        fd.append('image', file);
+        const r = await fetch(`/admin/products/${productId}/secondary-image`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body: fd
+        });
+        if (!r.ok) throw new Error('שגיאה בהעלאת תמונת משנה');
+      }
+      window._pendingSecondaryFiles = [];
     }
 
     toastOk(editId ? 'מוצר עודכן בהצלחה ✓' : 'מוצר חדש נוסף ✓');
@@ -752,6 +805,119 @@ function resetEngravingFields() {
   toggleBackSide(false);
   toggleMultiNames(false);
   updateFrontTextVis();
+}
+
+// ══════════════════════════════════════════════════════════
+// COLOR VARIANTS HELPERS
+// ══════════════════════════════════════════════════════════
+function renderColorVariants(variants) {
+  const container = document.getElementById('color-variants-list');
+  if (!variants.length) {
+    container.innerHTML = '<span style="font-size:0.8rem;color:var(--text-muted)">אין וריאציות צבע</span>';
+    return;
+  }
+  container.innerHTML = variants.map((v, i) => `
+    <div style="display:flex;align-items:center;gap:0.35rem;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:0.25rem 0.5rem 0.25rem 0.4rem">
+      <span style="display:inline-block;width:18px;height:18px;border-radius:50%;background:${v.hex};border:1px solid rgba(0,0,0,0.15);flex-shrink:0"></span>
+      <span style="font-size:0.82rem">${v.name}</span>
+      <button type="button" onclick="removeColorVariant(${i})" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:1rem;line-height:1;padding:0 0 0 2px" title="הסר">&times;</button>
+    </div>
+  `).join('');
+}
+
+function addColorVariant() {
+  const hex  = document.getElementById('cv-color-picker').value;
+  const name = document.getElementById('cv-name-input').value.trim();
+  if (!name) { document.getElementById('cv-name-input').focus(); return; }
+  const current = JSON.parse(document.getElementById('input-color-variants').value || '[]');
+  current.push({ name, hex });
+  document.getElementById('input-color-variants').value = JSON.stringify(current);
+  document.getElementById('cv-name-input').value = '';
+  renderColorVariants(current);
+}
+
+function removeColorVariant(index) {
+  const current = JSON.parse(document.getElementById('input-color-variants').value || '[]');
+  current.splice(index, 1);
+  document.getElementById('input-color-variants').value = JSON.stringify(current);
+  renderColorVariants(current);
+}
+
+// ══════════════════════════════════════════════════════════
+// SECONDARY IMAGES HELPERS
+// ══════════════════════════════════════════════════════════
+function renderSecondaryImages(urls) {
+  const grid = document.getElementById('secondary-images-grid');
+  if (!urls.length) {
+    grid.innerHTML = '<span style="font-size:0.8rem;color:var(--text-muted)">אין תמונות משנה</span>';
+    return;
+  }
+  grid.innerHTML = urls.map(url => `
+    <div style="position:relative;display:inline-block">
+      <img src="${url}" style="width:72px;height:72px;object-fit:cover;border-radius:6px;border:1px solid var(--border)"
+           onerror="this.style.background='#EDE5DE';this.removeAttribute('src')">
+      <button type="button" onclick="removeSecondaryImageFromServer('${url}')"
+              style="position:absolute;top:-6px;right:-6px;background:var(--danger,#c0392b);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:12px;line-height:18px;text-align:center;cursor:pointer;padding:0" title="הסר">&times;</button>
+    </div>
+  `).join('');
+}
+
+function handleSecondaryImageUpload(input) {
+  if (!input.files.length) return;
+  const file = input.files[0];
+  const editId = document.getElementById('edit-id').value;
+
+  if (editId) {
+    // Product already exists – upload immediately
+    const statusEl = document.getElementById('secondary-upload-status');
+    statusEl.textContent = 'מעלה...';
+    const fd    = new FormData();
+    fd.append('image', file);
+    const token = localStorage.getItem('admin_token');
+    fetch(`/admin/products/${editId}/secondary-image`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: fd
+    })
+    .then(r => r.json())
+    .then(data => {
+      statusEl.textContent = '';
+      renderSecondaryImages(data.secondary_images || []);
+    })
+    .catch(() => { statusEl.textContent = 'שגיאה בהעלאה'; });
+  } else {
+    // New product – queue file for upload after save
+    if (!window._pendingSecondaryFiles) window._pendingSecondaryFiles = [];
+    window._pendingSecondaryFiles.push(file);
+    // Show local preview
+    const reader = new FileReader();
+    reader.onload = e => {
+      const grid = document.getElementById('secondary-images-grid');
+      const existing = grid.innerHTML.includes('אין תמונות') ? '' : grid.innerHTML;
+      grid.innerHTML = existing + `
+        <div style="position:relative;display:inline-block">
+          <img src="${e.target.result}" style="width:72px;height:72px;object-fit:cover;border-radius:6px;border:2px dashed var(--border)">
+          <span style="position:absolute;bottom:2px;right:2px;background:rgba(0,0,0,0.5);color:#fff;font-size:9px;border-radius:3px;padding:1px 3px">ממתין</span>
+        </div>`;
+    };
+    reader.readAsDataURL(file);
+  }
+  input.value = '';
+}
+
+async function removeSecondaryImageFromServer(url) {
+  const editId = document.getElementById('edit-id').value;
+  if (!editId) return;
+  try {
+    const token = localStorage.getItem('admin_token');
+    const r = await fetch(`/admin/products/${editId}/secondary-image`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url })
+    });
+    const data = await r.json();
+    renderSecondaryImages(data.secondary_images || []);
+  } catch (e) { toastErr('שגיאה בהסרת התמונה'); }
 }
 
 // ══════════════════════════════════════════════════════════

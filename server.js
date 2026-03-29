@@ -121,6 +121,26 @@ app.post('/admin/products/:id/image', requireAdmin, upload.single('image'), (req
   res.json({ image_url: url, message: 'תמונה עודכנה' });
 });
 
+// ── Secondary images ─────────────────────────────────────────────────────
+app.post('/admin/products/:id/secondary-image', requireAdmin, upload.single('image'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'לא הועלתה תמונה' });
+  const p = products.getById(req.params.id);
+  if (!p) return res.status(404).json({ error: 'מוצר לא נמצא' });
+  const url = `/uploads/${req.file.filename}`;
+  const imgs = [...(p.secondary_images || []), url];
+  products.updateSecondaryImages(req.params.id, imgs);
+  res.json({ image_url: url, secondary_images: imgs });
+});
+
+app.delete('/admin/products/:id/secondary-image', requireAdmin, (req, res) => {
+  const { url } = req.body;
+  const p = products.getById(req.params.id);
+  if (!p) return res.status(404).json({ error: 'מוצר לא נמצא' });
+  const imgs = (p.secondary_images || []).filter(u => u !== url);
+  products.updateSecondaryImages(req.params.id, imgs);
+  res.json({ secondary_images: imgs });
+});
+
 // ════════════════════════════════════════════════════════════
 // PRODUCTS – BULK IMPORT
 // ════════════════════════════════════════════════════════════

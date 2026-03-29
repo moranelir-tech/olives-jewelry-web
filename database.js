@@ -83,6 +83,9 @@ const products = {
       details_waterproof: fields.details_waterproof || '',
       details_shipping:   fields.details_shipping   || '',
       details_engraving:  fields.details_engraving  || '',
+      dimensions:         fields.dimensions         || '',
+      color_variants:     fields.color_variants     || [],
+      secondary_images:   fields.secondary_images   || [],
       is_engravable:      Boolean(fields.is_engravable),
       engraving_settings: fields.engraving_settings || null,
       is_active:          true,
@@ -111,6 +114,9 @@ const products = {
       details_waterproof: fields.details_waterproof ?? p.details_waterproof ?? '',
       details_shipping:   fields.details_shipping   ?? p.details_shipping   ?? '',
       details_engraving:  fields.details_engraving  ?? p.details_engraving  ?? '',
+      dimensions:         fields.dimensions         ?? p.dimensions         ?? '',
+      color_variants:     fields.color_variants     !== undefined ? fields.color_variants     : (p.color_variants     || []),
+      secondary_images:   fields.secondary_images   !== undefined ? fields.secondary_images   : (p.secondary_images   || []),
       is_engravable:      fields.is_engravable !== undefined ? Boolean(fields.is_engravable) : p.is_engravable,
       engraving_settings: fields.engraving_settings !== undefined ? fields.engraving_settings : p.engraving_settings,
       updated_at:         now()
@@ -127,6 +133,11 @@ const products = {
   updateImage(id, url) {
     const p = data.products.find(p => p.id === parseInt(id));
     if (p) { p.image_url = url; p.updated_at = now(); save(); }
+  },
+
+  updateSecondaryImages(id, images) {
+    const p = data.products.find(p => p.id === parseInt(id));
+    if (p) { p.secondary_images = images; p.updated_at = now(); save(); }
   },
 
   softDelete(id) {
