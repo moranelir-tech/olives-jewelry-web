@@ -336,11 +336,24 @@ function renderProduct() {
       <div class="product-images">
         <div class="product-main-img" id="main-img-wrap">
           ${product.image_url
-            ? `<img src="${product.image_url}" alt="${product.name}"
+            ? `<img id="main-product-img" src="${product.image_url}" alt="${product.name}"
                     style="width:100%;height:100%;object-fit:cover;"
                     onerror="this.parentElement.innerHTML='<span>אין תמונה</span>'">`
             : `<span>אין תמונה</span>`}
         </div>
+        ${(() => {
+          const allImgs = [
+            ...(product.image_url ? [product.image_url] : []),
+            ...(product.secondary_images || [])
+          ];
+          if (allImgs.length < 2) return '';
+          return `<div class="product-thumbnails">
+            ${allImgs.map((url, i) => `
+              <button class="thumb-btn${i === 0 ? ' active' : ''}" onclick="switchMainImage(this,'${url}')" type="button">
+                <img src="${url}" alt="תמונה ${i+1}" onerror="this.parentElement.style.display='none'">
+              </button>`).join('')}
+          </div>`;
+        })()}
       </div>
 
       <!-- ─ Info ─ -->
@@ -704,6 +717,16 @@ function updatePriceSummary() {
     const pt = document.getElementById('ps-total');
     if (pt) pt.textContent = total.toLocaleString('he-IL') + ' ₪';
   }
+}
+
+// ══════════════════════════════════════════════════════════
+// IMAGE GALLERY
+// ══════════════════════════════════════════════════════════
+function switchMainImage(btn, url) {
+  const mainImg = document.getElementById('main-product-img');
+  if (mainImg) mainImg.src = url;
+  document.querySelectorAll('.thumb-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
 }
 
 // ══════════════════════════════════════════════════════════
