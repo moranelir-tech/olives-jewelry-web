@@ -122,6 +122,55 @@ app.post('/admin/products/:id/image', requireAdmin, upload.single('image'), (req
 });
 
 // ════════════════════════════════════════════════════════════
+// PRODUCTS – BULK IMPORT
+// ════════════════════════════════════════════════════════════
+app.post('/admin/products/import-bulk', requireAdmin, (req, res) => {
+  const { products: rows } = req.body;
+  if (!Array.isArray(rows) || rows.length === 0)
+    return res.status(400).json({ error: 'יש לספק מערך מוצרים' });
+
+  const errors  = [];
+  const results = [];
+  let   created = 0;
+
+  for (let i = 0; i < rows.length; i++) {
+    const row    = { ...rows[i] };
+    const rowNum = i + 1;
+
+    // Required-field validation
+    if (!row.name || !row.price || !row.category) {
+      errors.push(`שורה ${rowNum}: שם, מחיר וקטגוריה הם שדות חובה – המוצר דולג`);
+      results.push({ row: rowNum, status: 'skipped' });
+      continue;
+    }
+
+    // Resolve image_filename → image_url
+    if (row.image_filename) {
+      const filename  = row.image_filename;
+      const imagePath = path.join(__dirname, 'uploads', filename);
+
+      if (fs.existsSync(imagePath)) {
+        row.image_url = `/uploads/${filename}`;
+      } else {
+        errors.push(`אזהרה – שורה ${rowNum}: תמונה "${filename}" לא נמצאה בתיקיית uploads. המוצר נוצר ללא תמונה`);
+      }
+      delete row.image_filename;
+    }
+
+    try {
+      const id = products.create(row);
+      created++;
+      results.push({ row: rowNum, status: 'created', id });
+    } catch (err) {
+      errors.push(`שורה ${rowNum}: שגיאה ביצירת המוצר – ${err.message}`);
+      results.push({ row: rowNum, status: 'error' });
+    }
+  }
+
+  res.status(201).json({ created, errors, results });
+});
+
+// ════════════════════════════════════════════════════════════
 // ORDERS
 // ════════════════════════════════════════════════════════════
 app.get('/admin/orders', requireAdmin, (req, res) => {

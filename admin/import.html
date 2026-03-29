@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>יבוא מרובה – Olives Admin</title>
+  <link rel="stylesheet" href="./admin.css">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+  <style>
+    /* ── Import-specific styles ─────────────────────────────── */
+    .import-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 900px) { .import-grid { grid-template-columns: 1fr; } }
+
+    .info-box {
+      background: var(--olive-light);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.4rem;
+    }
+    .info-box h3 {
+      font-size: 0.92rem;
+      font-weight: 700;
+      margin-bottom: 0.85rem;
+      color: var(--text);
+    }
+    .col-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .col-table th {
+      background: rgba(59,64,42,0.07);
+      padding: 0.45rem 0.7rem;
+      text-align: right;
+      font-weight: 700;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+    }
+    .col-table td {
+      padding: 0.4rem 0.7rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+      vertical-align: top;
+    }
+    .col-table tr:last-child td { border-bottom: none; }
+    .col-table .required-dot {
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--warning);
+      margin-left: 5px;
+      vertical-align: middle;
+    }
+
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 3rem 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+      background: var(--card);
+    }
+    .drop-zone:hover,
+    .drop-zone.drag-over {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+    .drop-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+    .drop-icon {
+      width: 48px; height: 48px;
+      margin: 0 auto 1rem;
+      color: var(--accent);
+    }
+    .drop-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      color: var(--text);
+    }
+    .drop-sub {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .file-selected-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.85rem 1rem;
+      background: var(--accent-light);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      margin-top: 0.75rem;
+    }
+    .file-selected-info svg { color: var(--accent); flex-shrink: 0; }
+    .file-selected-info .fname { font-weight: 700; font-size: 0.9rem; }
+    .file-selected-info .fmeta { font-size: 0.8rem; color: var(--text-muted); }
+    .file-selected-info .clear-file {
+      margin-right: auto;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      line-height: 1;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      transition: background 0.15s;
+    }
+    .file-selected-info .clear-file:hover { background: rgba(0,0,0,0.06); }
+
+    /* Preview table */
+    .preview-section { display: none; }
+    .preview-section.visible { display: block; }
+
+    .preview-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.3rem 0.7rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+    .badge-green { background: rgba(46,125,50,0.12); color: var(--success); }
+    .badge-orange { background: rgba(230,81,0,0.1); color: var(--warning); }
+
+    .preview-table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
+    .preview-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      min-width: 640px;
+    }
+    .preview-table th {
+      background: rgba(59,64,42,0.05);
+      padding: 0.55rem 0.85rem;
+      text-align: right;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .preview-table td {
+      padding: 0.5rem 0.85rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .preview-table tr:last-child td { border-bottom: none; }
+    .preview-table tr.row-warn td { background: rgba(230,81,0,0.04); }
+    .preview-table tr.row-err td { background: rgba(198,40,40,0.04); }
+    .row-status {
+      font-size: 0.75rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .row-status.ok { color: var(--success); }
+    .row-status.warn { color: var(--warning); }
+    .row-status.err { color: var(--danger); }
+
+    /* Results section */
+    .results-section { display: none; }
+    .results-section.visible { display: block; }
+
+    .results-summary {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .result-stat {
+      flex: 1;
+      min-width: 130px;
+      padding: 1rem 1.25rem;
+      border-radius: 10px;
+      text-align: center;
+    }
+    .result-stat.green { background: rgba(46,125,50,0.1); border: 1px solid rgba(46,125,50,0.25); }
+    .result-stat.orange { background: rgba(230,81,0,0.08); border: 1px solid rgba(230,81,0,0.2); }
+    .result-stat .stat-num { font-size: 2rem; font-weight: 700; line-height: 1; }
+    .result-stat.green .stat-num { color: var(--success); }
+    .result-stat.orange .stat-num { color: var(--warning); }
+    .result-stat .stat-label { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem; }
+
+    .error-list { list-style: none; margin-top: 0.5rem; }
+    .error-list li {
+      padding: 0.5rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.83rem;
+      margin-bottom: 0.35rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .error-list li.warn-item { background: rgba(230,81,0,0.07); color: #7c3600; }
+    .error-list li.err-item  { background: rgba(198,40,40,0.07); color: var(--danger); }
+    .error-list li svg { flex-shrink: 0; margin-top: 1px; }
+
+    .import-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      margin-top: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    /* Loading state */
+    .btn-loading { position: relative; }
+    .btn-loading::after {
+      content: '';
+      position: absolute;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      right: 0.9rem; top: 50%;
+      transform: translateY(-50%);
+    }
+    @keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
+  </style>
+</head>
+<body>
+<div class="admin-layout">
+
+  <!-- ── Sidebar ─────────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <span class="brand-name">OLIVES</span>
+      <span class="brand-sub">Admin Panel</span>
+    </div>
+    <nav class="sidebar-nav">
+      <span class="nav-section-title">ראשי</span>
+      <a href="./dashboard.html" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <span class="nav-section-title">קטלוג</span>
+      <a href="./products.html" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+        מוצרים
+      </a>
+      <a href="./import.html" class="nav-link active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        יבוא מרובה
+      </a>
+      <span class="nav-section-title">מכירות</span>
+      <a href="./orders.html" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/></svg>
+        הזמנות
+      </a>
+    </nav>
+    <div class="sidebar-footer">Olives Jewelry &copy; 2026</div>
+  </aside>
+
+  <!-- ── Main ───────────────────────────────────────────── -->
+  <div class="main-content">
+    <header class="topbar">
+      <span class="topbar-title">יבוא מוצרים מ-Excel</span>
+      <div class="topbar-right">
+        <div class="topbar-user">
+          <div class="avatar">A</div>
+          <span id="admin-username">admin</span>
+        </div>
+        <button class="btn-logout" onclick="logout()">יציאה</button>
+      </div>
+    </header>
+
+    <main class="page-content">
+      <div class="page-header">
+        <div>
+          <h1>יבוא מרובה</h1>
+          <p>העלאת קובץ Excel עם מוצרים מרובים בפעולה אחת</p>
+        </div>
+        <button class="btn btn-ghost" onclick="downloadTemplate()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          הורד קובץ דוגמה
+        </button>
+      </div>
+
+      <!-- ── Info + Upload grid ──────────────────────────── -->
+      <div class="import-grid">
+
+        <!-- Column reference -->
+        <div class="card info-box">
+          <h3>עמודות הקובץ הנדרשות</h3>
+          <table class="col-table">
+            <thead>
+              <tr>
+                <th>כותרת Excel</th>
+                <th>שדה</th>
+                <th>הערה</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>שם</code> <span class="required-dot" title="חובה"></span></td>
+                <td>שם מוצר</td>
+                <td>חובה</td>
+              </tr>
+              <tr>
+                <td><code>מחיר</code> <span class="required-dot" title="חובה"></span></td>
+                <td>מחיר (₪)</td>
+                <td>חובה, מספר</td>
+              </tr>
+              <tr>
+                <td><code>קטגוריה</code> <span class="required-dot" title="חובה"></span></td>
+                <td>קטגוריה</td>
+                <td>חובה — ראה ערכים</td>
+              </tr>
+              <tr>
+                <td><code>תיאור</code></td>
+                <td>תיאור</td>
+                <td>אופציונלי</td>
+              </tr>
+              <tr>
+                <td><code>מלאי</code></td>
+                <td>כמות מלאי</td>
+                <td>מספר, ברירת מחדל 0</td>
+              </tr>
+              <tr>
+                <td><code>תמונה_ראשית</code></td>
+                <td>שם קובץ תמונה</td>
+                <td>למשל: bracelet.jpg</td>
+              </tr>
+              <tr>
+                <td><code>ניתן_לחריטה</code></td>
+                <td>ניתן לחריטה</td>
+                <td>כן / לא</td>
+              </tr>
+              <tr>
+                <td><code>חומר</code></td>
+                <td>חומר</td>
+                <td>אופציונלי</td>
+              </tr>
+              <tr>
+                <td><code>עמיד_במים</code></td>
+                <td>עמיד במים</td>
+                <td>אופציונלי</td>
+              </tr>
+              <tr>
+                <td><code>משלוח</code></td>
+                <td>משלוח</td>
+                <td>אופציונלי</td>
+              </tr>
+              <tr>
+                <td><code>הערות_חריטה</code></td>
+                <td>הערות חריטה</td>
+                <td>אופציונלי</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="font-size:0.76rem;color:var(--text-muted);margin-top:0.75rem;">
+            <span class="required-dot"></span> שדות חובה &nbsp;|&nbsp;
+            קטגוריות תקפות: צמידי חריטה, שרשראות חריטה, טבעות חריטה, צמידים, שרשראות, עגילים
+          </p>
+        </div>
+
+        <!-- Upload zone -->
+        <div class="card" style="display:flex;flex-direction:column;gap:1rem;">
+          <h3 style="font-size:0.92rem;font-weight:700;">העלאת קובץ</h3>
+
+          <div class="drop-zone" id="drop-zone">
+            <input type="file" id="file-input" accept=".xlsx,.xls,.csv" onchange="handleFileSelect(event)">
+            <svg class="drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+            </svg>
+            <div class="drop-title">גרור קובץ לכאן, או לחץ לבחירה</div>
+            <div class="drop-sub">תומך בקבצי .xlsx, .xls</div>
+          </div>
+
+          <div id="file-info" style="display:none;" class="file-selected-info">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+              <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <div>
+              <div class="fname" id="file-name">קובץ.xlsx</div>
+              <div class="fmeta" id="file-meta"></div>
+            </div>
+            <button class="clear-file" onclick="clearFile()" title="הסר קובץ">&times;</button>
+          </div>
+
+          <div id="parse-error" style="display:none;padding:0.65rem 0.9rem;background:rgba(198,40,40,0.07);border-radius:7px;color:var(--danger);font-size:0.83rem;"></div>
+        </div>
+      </div>
+
+      <!-- ── Preview ─────────────────────────────────────── -->
+      <div class="card preview-section" id="preview-section">
+        <div class="preview-meta">
+          <span style="font-weight:700;font-size:0.95rem;">תצוגה מקדימה</span>
+          <span class="badge badge-green" id="badge-valid">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg>
+            <span id="badge-valid-num">0</span> שורות תקינות
+          </span>
+          <span class="badge badge-orange" id="badge-warn" style="display:none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+            <span id="badge-warn-num">0</span> אזהרות
+          </span>
+          <span class="badge" style="background:rgba(198,40,40,0.08);color:var(--danger);display:none;" id="badge-err">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            <span id="badge-err-num">0</span> שגיאות (לא ייובאו)
+          </span>
+        </div>
+
+        <div class="preview-table-wrap">
+          <table class="preview-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>שם</th>
+                <th>מחיר</th>
+                <th>קטגוריה</th>
+                <th>מלאי</th>
+                <th>תמונה_ראשית</th>
+                <th>ניתן_לחריטה</th>
+                <th>סטטוס</th>
+              </tr>
+            </thead>
+            <tbody id="preview-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="import-actions">
+          <button class="btn btn-primary" id="import-btn" onclick="runImport()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            יבא מוצרים
+          </button>
+          <button class="btn btn-ghost" onclick="clearFile()">ביטול</button>
+          <span id="import-row-count" style="color:var(--text-muted);font-size:0.83rem;"></span>
+        </div>
+      </div>
+
+      <!-- ── Results ─────────────────────────────────────── -->
+      <div class="card results-section" id="results-section">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem;">
+          <span style="font-weight:700;font-size:0.95rem;">תוצאות היבוא</span>
+          <button class="btn btn-ghost btn-sm" onclick="resetAll()">יבוא נוסף</button>
+        </div>
+
+        <div class="results-summary">
+          <div class="result-stat green">
+            <div class="stat-num" id="res-created">0</div>
+            <div class="stat-label">מוצרים נוצרו</div>
+          </div>
+          <div class="result-stat orange" id="res-errors-box">
+            <div class="stat-num" id="res-errors">0</div>
+            <div class="stat-label">הודעות / אזהרות</div>
+          </div>
+        </div>
+
+        <div id="res-error-list-wrap" style="display:none;">
+          <p style="font-size:0.85rem;font-weight:700;margin-bottom:0.5rem;color:var(--text-muted);">פרטי שגיאות ואזהרות:</p>
+          <ul class="error-list" id="res-error-list"></ul>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script src="./admin.js"></script>
+<script>
+  const VALID_CATEGORIES = ['צמידי חריטה','שרשראות חריטה','טבעות חריטה','צמידים','שרשראות','עגילים'];
+  let parsedRows = [];
+
+  // ── Auth init ────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => requireAuth());
+
+  // ── Drag & drop wiring ───────────────────────────────────
+  const dropZone = document.getElementById('drop-zone');
+
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('drag-over');
+  });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) processFile(file);
+  });
+
+  // ── File select via input ────────────────────────────────
+  function handleFileSelect(e) {
+    const file = e.target.files[0];
+    if (file) processFile(file);
+  }
+
+  // ── Process file ─────────────────────────────────────────
+  function processFile(file) {
+    clearParseError();
+    const allowed = ['.xlsx','.xls','.csv'];
+    const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+    if (!allowed.includes(ext)) {
+      showParseError('קובץ לא נתמך. יש להעלות קובץ .xlsx או .xls');
+      return;
+    }
+
+    document.getElementById('file-name').textContent = file.name;
+    document.getElementById('file-meta').textContent = formatBytes(file.size);
+    document.getElementById('file-info').style.display = 'flex';
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const wb   = XLSX.read(data, { type: 'array' });
+        const ws   = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+
+        if (!rows.length) {
+          showParseError('הקובץ ריק או שאין שורות נתונים.');
+          return;
+        }
+
+        parsedRows = rows.map((r, i) => mapRow(r, i + 2)); // i+2 = Excel row number (header=1)
+        renderPreview(parsedRows);
+        hideResults();
+      } catch (err) {
+        showParseError('שגיאה בקריאת הקובץ: ' + err.message);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  // ── Map Excel row → product object ───────────────────────
+  function mapRow(r, excelRow) {
+    const errors = [];
+    const warnings = [];
+
+    const name     = String(r['שם'] || '').trim();
+    const price    = parseFloat(r['מחיר']);
+    const category = String(r['קטגוריה'] || '').trim();
+
+    if (!name)          errors.push('שם המוצר חסר');
+    if (isNaN(price) || price <= 0) errors.push('מחיר לא תקין');
+    if (!category)      errors.push('קטגוריה חסרה');
+    else if (!VALID_CATEGORIES.includes(category)) errors.push(`קטגוריה לא מוכרת: "${category}"`);
+
+    const engravableRaw = String(r['ניתן_לחריטה'] || '').trim();
+    const is_engravable = engravableRaw === 'כן';
+
+    const image_filename = String(r['תמונה_ראשית'] || '').trim();
+    if (image_filename) warnings.push(`תמונה "${image_filename}" תאומת בשרת`);
+
+    const product = {
+      name,
+      price: isNaN(price) ? 0 : price,
+      category,
+      description:        String(r['תיאור'] || '').trim(),
+      stock_quantity:     parseInt(r['מלאי']) || 0,
+      is_engravable,
+      details_material:   String(r['חומר'] || '').trim(),
+      details_waterproof: String(r['עמיד_במים'] || '').trim(),
+      details_shipping:   String(r['משלוח'] || '').trim(),
+      details_engraving:  String(r['הערות_חריטה'] || '').trim(),
+    };
+    if (image_filename) product.image_filename = image_filename;
+
+    return { excelRow, product, errors, warnings, valid: errors.length === 0 };
+  }
+
+  // ── Render preview table ─────────────────────────────────
+  function renderPreview(rows) {
+    const tbody     = document.getElementById('preview-tbody');
+    const validCount = rows.filter(r => r.valid).length;
+    const warnCount  = rows.filter(r => r.valid && r.warnings.length).length;
+    const errCount   = rows.filter(r => !r.valid).length;
+
+    document.getElementById('badge-valid-num').textContent = validCount;
+    document.getElementById('badge-warn-num').textContent  = warnCount;
+    document.getElementById('badge-err-num').textContent   = errCount;
+
+    const badgeWarn = document.getElementById('badge-warn');
+    const badgeErr  = document.getElementById('badge-err');
+    badgeWarn.style.display = warnCount  ? 'inline-flex' : 'none';
+    badgeErr.style.display  = errCount   ? 'inline-flex' : 'none';
+
+    tbody.innerHTML = rows.map((r, idx) => {
+      const p   = r.product;
+      const cls = !r.valid ? 'row-err' : r.warnings.length ? 'row-warn' : '';
+      const statusText = !r.valid
+        ? r.errors.join(', ')
+        : r.warnings.length
+          ? 'אזהרה: ' + r.warnings.join(', ')
+          : 'תקין';
+      const statusCls = !r.valid ? 'err' : r.warnings.length ? 'warn' : 'ok';
+
+      return `<tr class="${cls}">
+        <td>${r.excelRow}</td>
+        <td title="${escHtml(p.name)}">${escHtml(p.name) || '<em style="color:var(--text-muted)">חסר</em>'}</td>
+        <td>${p.price ? '₪' + p.price.toLocaleString() : '—'}</td>
+        <td>${escHtml(p.category) || '—'}</td>
+        <td>${p.stock_quantity}</td>
+        <td title="${escHtml(p.image_filename || '')}">${escHtml(p.image_filename || '') || '—'}</td>
+        <td>${p.is_engravable ? 'כן' : 'לא'}</td>
+        <td><span class="row-status ${statusCls}" title="${escHtml(statusText)}">${escHtml(statusText)}</span></td>
+      </tr>`;
+    }).join('');
+
+    const importable = validCount;
+    document.getElementById('import-row-count').textContent =
+      importable > 0 ? `${importable} מוצרים ייובאו` : 'אין שורות תקינות לייבוא';
+
+    const importBtn = document.getElementById('import-btn');
+    importBtn.disabled = importable === 0;
+
+    showSection('preview-section');
+  }
+
+  // ── Run import ───────────────────────────────────────────
+  async function runImport() {
+    const validRows = parsedRows.filter(r => r.valid);
+    if (!validRows.length) { toastErr('אין שורות תקינות לייבוא'); return; }
+
+    const btn = document.getElementById('import-btn');
+    btn.disabled = true;
+    btn.classList.add('btn-loading');
+    btn.textContent = 'מייבא...';
+
+    try {
+      const body = { products: validRows.map(r => r.product) };
+      const result = await api('POST', '/admin/products/import-bulk', body);
+      showResults(result);
+    } catch (err) {
+      toastErr('שגיאת ייבוא: ' + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.classList.remove('btn-loading');
+      btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> יבא מוצרים`;
+    }
+  }
+
+  // ── Show results ─────────────────────────────────────────
+  function showResults(result) {
+    document.getElementById('res-created').textContent = result.created ?? 0;
+    document.getElementById('res-errors').textContent  = result.errors?.length ?? 0;
+
+    const errListWrap = document.getElementById('res-error-list-wrap');
+    const errList     = document.getElementById('res-error-list');
+
+    if (result.errors && result.errors.length) {
+      errListWrap.style.display = 'block';
+      errList.innerHTML = result.errors.map(e => {
+        const isWarn = /אזהרה|תמונה/i.test(e);
+        return `<li class="${isWarn ? 'warn-item' : 'err-item'}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+            ${isWarn
+              ? '<path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>'
+              : '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>'}
+          </svg>
+          ${escHtml(e)}
+        </li>`;
+      }).join('');
+    } else {
+      errListWrap.style.display = 'none';
+    }
+
+    hideSection('preview-section');
+    showSection('results-section');
+
+    if (result.created > 0) {
+      toastOk(`${result.created} מוצרים יובאו בהצלחה!`);
+    }
+  }
+
+  // ── Download template ─────────────────────────────────────
+  function downloadTemplate() {
+    const headers = ['שם','מחיר','קטגוריה','תיאור','מלאי','תמונה_ראשית','ניתן_לחריטה','חומר','עמיד_במים','משלוח','הערות_חריטה'];
+    const example1 = ['צמיד זהב חריטה',299,'צמידי חריטה','צמיד זהב 14K עם אפשרות חריטה אישית',10,'bracelet-gold.jpg','כן','זהב 14K','כן','3-5 ימי עסקים','עד 20 תווים'];
+    const example2 = ['שרשרת כסף',149,'שרשראות','שרשרת כסף 925 עדינה',5,'necklace-silver.jpg','לא','כסף 925','כן','3-5 ימי עסקים',''];
+
+    const ws = XLSX.utils.aoa_to_sheet([headers, example1, example2]);
+
+    // Set column widths
+    ws['!cols'] = [
+      {wch:22},{wch:10},{wch:18},{wch:30},{wch:8},{wch:22},{wch:14},{wch:14},{wch:12},{wch:20},{wch:20}
+    ];
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'מוצרים');
+    XLSX.writeFile(wb, 'olives-import-template.xlsx');
+    toastOk('קובץ הדוגמה הורד!');
+  }
+
+  // ── Clear / reset ─────────────────────────────────────────
+  function clearFile() {
+    parsedRows = [];
+    document.getElementById('file-input').value = '';
+    document.getElementById('file-info').style.display = 'none';
+    clearParseError();
+    hideSection('preview-section');
+    hideSection('results-section');
+    document.getElementById('preview-tbody').innerHTML = '';
+  }
+
+  function resetAll() {
+    clearFile();
+    hideSection('results-section');
+  }
+
+  // ── Helpers ───────────────────────────────────────────────
+  function showSection(id)  { document.getElementById(id).classList.add('visible'); }
+  function hideSection(id)  { document.getElementById(id).classList.remove('visible'); }
+  function hideResults()    { hideSection('results-section'); }
+
+  function showParseError(msg) {
+    const el = document.getElementById('parse-error');
+    el.textContent = msg;
+    el.style.display = 'block';
+    hideSection('preview-section');
+  }
+  function clearParseError() {
+    const el = document.getElementById('parse-error');
+    el.textContent = '';
+    el.style.display = 'none';
+  }
+
+  function formatBytes(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;');
+  }
+</script>
+</body>
+</html>
