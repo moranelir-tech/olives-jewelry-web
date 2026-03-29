@@ -1,6 +1,8 @@
 ---
 deployment:
   tasks:
-    - cd /home/olivesje/olives-jewelry && git fetch origin && git reset --hard origin/main
+    - cd /home/olivesje/olives-jewelry && git fetch origin
+    - cd /home/olivesje/olives-jewelry && git checkout -f origin/main -- index.html shop.html product.html category.html cart.html style.css server.js database.js package.json package-lock.json .gitignore
+    - cd /home/olivesje/olives-jewelry && git checkout -f origin/main -- admin/
     - export PATH=/home/olivesje/nodevenv/olives-jewelry/20/bin:$PATH
     - cd /home/olivesje/olives-jewelry && npm install --production
