@@ -24,21 +24,26 @@
       color: var(--accent);
     }
 
-    /* Side tabs (קדמי / אחורי) */
-    .eng-side-tabs {
-      display: flex; gap: var(--s8);
-      border-bottom: 1px solid var(--border);
-      margin-bottom: var(--s8);
+    /* Back side toggle checkbox */
+    .eng-back-toggle-row {
+      margin: var(--s6) 0 var(--s4);
     }
-    .eng-side-tab {
-      font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase;
-      color: #2A2520; padding-bottom: var(--s3); margin-bottom: -1px;
-      border-bottom: 1px solid transparent;
-      cursor: pointer; background: none; border-top: none;
-      border-right: none; border-left: none;
-      transition: color 0.2s, border-color 0.2s;
+    .eng-back-toggle-label {
+      display: flex; align-items: center; gap: 0.5rem;
+      cursor: pointer;
     }
-    .eng-side-tab.active { color: var(--olive); border-bottom-color: var(--olive); font-weight: 500; }
+    .eng-back-toggle-label input[type="checkbox"] {
+      accent-color: var(--olive);
+      width: 15px; height: 15px; cursor: pointer; flex-shrink: 0;
+    }
+    .eng-back-toggle-text {
+      font-size: 0.78rem; letter-spacing: 0.08em; color: var(--text);
+    }
+    #panel-back {
+      padding-top: var(--s6);
+      border-top: 1px solid var(--border);
+      margin-top: var(--s4);
+    }
 
     /* Type selector */
     .eng-type-row { display: flex; gap: var(--s6); margin-bottom: var(--s6); }
@@ -453,22 +458,20 @@ function buildEngravingUI(front, back, multiNames) {
       <span class="eng-price-note">${priceNote}</span>
     </div>`;
 
-  // ── Side tabs (only if back side exists) ──
-  if (hasBack) {
-    html += `<div class="eng-side-tabs">
-      <button class="eng-side-tab active" id="tab-front" onclick="switchSide('front')">קדמי</button>
-      <button class="eng-side-tab" id="tab-back" onclick="switchSide('back')">אחורי${back.price_addition > 0 ? ` · +${back.price_addition} ₪` : ''}</button>
-    </div>`;
-  }
-
-  // ── Front panel ──
+  // ── Front panel (always visible) ──
   html += `<div id="panel-front">`;
   html += buildSidePanel('front', front);
   html += `</div>`;
 
-  // ── Back panel ──
+  // ── Back side — toggle checkbox + collapsible panel ──
   if (hasBack) {
-    html += `<div id="panel-back" style="display:none">`;
+    html += `<div class="eng-back-toggle-row">
+      <label class="eng-back-toggle-label">
+        <input type="checkbox" id="back-toggle" onchange="toggleBackPanel(this.checked)">
+        <span class="eng-back-toggle-text">חריטה בצד השני?${back.price_addition > 0 ? ` <span class="eng-price-note"> +${back.price_addition} ₪</span>` : ''}</span>
+      </label>
+    </div>
+    <div id="panel-back" style="display:none">`;
     html += buildSidePanel('back', back);
     html += `</div>`;
   }
@@ -571,11 +574,17 @@ function attachEngravingEvents(front, back, multiNames) {
 // ENGRAVING INTERACTIONS
 // ══════════════════════════════════════════════════════════
 
-function switchSide(side) {
-  ['front','back'].forEach(s => {
-    document.getElementById(`tab-${s}`)?.classList.toggle('active', s === side);
-    document.getElementById(`panel-${s}`).style.display = s === side ? 'block' : 'none';
-  });
+function toggleBackPanel(show) {
+  document.getElementById('panel-back').style.display = show ? 'block' : 'none';
+  if (!show) {
+    state.back.text = '';
+    state.back.imageFile = null;
+    const textEl = document.getElementById('text-back');
+    if (textEl) { textEl.value = ''; }
+    const charEl = document.getElementById('chars-back');
+    if (charEl) charEl.textContent = '0';
+  }
+  updatePriceSummary();
 }
 
 function setType(side, type) {
