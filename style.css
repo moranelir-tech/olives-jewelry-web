@@ -2307,28 +2307,3 @@ input, textarea, select {
   .main-footer { padding-right: var(--s6); padding-left: var(--s6); }
 
 }
-/* =========================================
-   עריכת שדות החריטה ללקוח (עמוד מוצר)
-   בהתאמה לעיצוב הזהב של האתר
-   ========================================= */
-
-#engraving-container {
-    background-color: #fcfaf7;
-    border-right: 4px solid #bfa37e;
-    border-radius: 4px;
-    padding: 20px;
-    margin: 25px 0;
-}
-
-.engraving-input,
-.engraving-select {
-    border: 1px solid #ddd;
-    padding: 10px;
-    border-radius: 3px;
-}
-.engraving-input:focus,
-.engraving-select:focus {
-    border-color: #bfa37e;
-    box-shadow: 0 0 0 2px rgba(191, 163, 126, 0.2);
-    outline: none;
-}

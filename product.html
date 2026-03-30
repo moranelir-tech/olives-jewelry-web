@@ -7,171 +7,117 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Hebrew:wght@300;400;600&family=Heebo:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600&family=Rubik:wght@300;400;500&family=Varela+Round&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <style>
-    /* ════════════════════════════════════════════════
-       ENGRAVING — Inline Flow
-    ════════════════════════════════════════════════ */
-
-    .eng-section .section-label {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #bfa37e; /* Gold accent color */
-        letter-spacing: 0.1em;
-    }
-
-    /* Section header row */
+    /* ══ ENGRAVING — Tab Flow ════════════════════════════════ */
     .eng-section { margin-top: 0; }
-    .eng-section-head {
-      display: flex; align-items: baseline; justify-content: space-between;
-      margin-bottom: var(--s6);
-    }
-    .eng-price-note {
-      font-size: 0.72rem; letter-spacing: 0.06em;
-      color: var(--accent);
-    }
+    .eng-section-head { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:var(--s4); }
+    .eng-price-note { font-size:0.72rem; letter-spacing:0.06em; color:var(--accent); }
+    .eng-section .section-label { font-size:1.1rem; font-weight:600; color:#bfa37e; letter-spacing:0.1em; }
 
-    /* Back side toggle checkbox */
-    .eng-back-toggle-row {
-      margin: var(--s6) 0 var(--s4);
+    /* Tab bar */
+    .eng-tab-bar { display:flex; gap:0; border-bottom:1px solid #e8ddd5; margin-bottom:var(--s6); }
+    .eng-tab {
+      font-size:0.76rem; letter-spacing:0.1em; text-transform:uppercase;
+      color:#a09189; background:none; border:none;
+      padding:0.55rem 1.1rem; cursor:pointer;
+      border-bottom:2px solid transparent; margin-bottom:-1px;
+      transition:color 0.2s, border-color 0.2s;
     }
-    .eng-back-toggle-label {
-      display: flex; align-items: center; gap: 0.5rem;
-      cursor: pointer;
-    }
-    .eng-back-toggle-label input[type="checkbox"] {
-      accent-color: var(--olive);
-      width: 15px; height: 15px; cursor: pointer; flex-shrink: 0;
-    }
-    .eng-back-toggle-text {
-      font-size: 0.78rem; letter-spacing: 0.08em; color: var(--text);
-    }
-    #panel-back {
-      padding-top: var(--s6);
-      border-top: 1px solid var(--border);
-      margin-top: var(--s4);
-    }
+    .eng-tab.active { color:#bfa37e; border-bottom-color:#bfa37e; font-weight:600; }
+    .eng-tab:hover:not(.active) { color:#5D524C; }
 
-    /* Type selector */
-    .eng-type-row { display: flex; gap: var(--s6); margin-bottom: var(--s6); }
-    .eng-type-btn {
-      font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
-      color: #2A2520; background: none; border: none; padding: 0;
-      padding-bottom: 2px; border-bottom: 1px solid transparent;
-      cursor: pointer; transition: color 0.2s, border-color 0.2s;
-    }
-    .eng-type-btn.active { color: var(--olive); border-bottom-color: var(--olive); font-weight: 500; }
+    /* Tab panels */
+    .eng-tab-panel { display:none; }
+    .eng-tab-panel.active { display:block; }
 
-    /* Font selector */
-    .eng-font-label {
-      font-size: 0.62rem; letter-spacing: 0.24em; text-transform: uppercase;
-      color: var(--olive); margin-bottom: var(--s3);
+    /* Back toggle */
+    .eng-back-toggle-row { margin:var(--s6) 0 0; }
+    .eng-back-toggle-label { display:flex; align-items:center; gap:0.5rem; cursor:pointer; }
+    .eng-back-toggle-label input[type="checkbox"] { accent-color:#bfa37e; width:15px; height:15px; cursor:pointer; flex-shrink:0; }
+    .eng-back-toggle-text { font-size:0.78rem; letter-spacing:0.08em; color:var(--text); }
+
+    /* Steps */
+    .eng-step { margin-bottom:var(--s6); }
+    .eng-step-label { font-size:0.62rem; letter-spacing:0.24em; text-transform:uppercase; color:#bfa37e; margin-bottom:var(--s3); display:flex; align-items:center; gap:0.5rem; }
+    .eng-step-num { display:inline-flex; align-items:center; justify-content:center; width:17px; height:17px; border:1px solid #bfa37e; border-radius:50%; font-size:0.58rem; color:#bfa37e; flex-shrink:0; }
+
+    /* Language buttons */
+    .eng-lang-btns { display:flex; gap:var(--s3); }
+    .eng-lang-btn {
+      padding:0.4rem 1.1rem; border:1px solid #e8ddd5; background:#fff;
+      font-size:0.8rem; letter-spacing:0.06em; color:#a09189;
+      cursor:pointer; border-radius:2px; transition:all 0.2s;
     }
-    .font-selector { display: flex; gap: var(--s6); flex-wrap: wrap; margin-bottom: var(--s6); }
-    .font-opt {
-      font-size: 0.85rem; cursor: pointer; color: #2A2520;
-      background: none; border: none; padding: 0;
-      padding-bottom: 1px; border-bottom: 1px solid transparent;
-      transition: color 0.2s, border-color 0.2s;
+    .eng-lang-btn.active { border-color:#bfa37e; color:#bfa37e; background:rgba(191,163,126,0.07); font-weight:600; }
+    .eng-lang-btn:hover:not(.active) { border-color:#c9b8ad; color:#5D524C; }
+
+    /* Font option cards */
+    .eng-font-opts { display:flex; gap:var(--s3); flex-wrap:wrap; }
+    .eng-font-opt {
+      display:flex; flex-direction:column; align-items:center;
+      padding:0.75rem 1rem; min-width:95px;
+      border:1px solid #e8ddd5; background:#fff; cursor:pointer;
+      border-radius:3px; transition:all 0.2s; text-align:center;
     }
-    .font-opt.active { color: var(--olive); border-bottom-color: var(--olive); font-weight: 500; }
+    .eng-font-opt.active { border-color:#bfa37e; background:rgba(191,163,126,0.07); box-shadow:0 0 0 1px rgba(191,163,126,0.25); }
+    .eng-font-opt:hover:not(.active) { border-color:#c9b8ad; }
+    .font-opt-sample { font-size:1.25rem; color:#2A2520; line-height:1.4; margin-bottom:0.25rem; }
+    .font-opt-name { font-size:0.58rem; letter-spacing:0.08em; color:#a09189; margin-bottom:0.1rem; }
+    .font-opt-tag { font-size:0.54rem; letter-spacing:0.12em; text-transform:uppercase; color:#bfa37e; }
+
+    /* Text input + live preview */
+    .eng-text-input {
+      width:100%; padding:0.7rem 0;
+      border:none; border-bottom:2px solid #e8ddd5;
+      border-radius:0; background:transparent;
+      font-size:1.1rem; color:var(--text);
+      transition:border-color 0.2s; margin-bottom:0.3rem;
+    }
+    .eng-text-input::placeholder { color:#b8a89d; font-size:0.85rem; font-family:var(--sans); }
+    .eng-text-input:focus { outline:none; border-bottom-color:#bfa37e; }
+    .eng-text-input.error { border-bottom-color:#C0392B; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-5px)} 60%{transform:translateX(5px)} }
+    .eng-text-input.shake { animation:shake 0.35s ease; }
+    .eng-error-msg { font-size:0.68rem; color:#C0392B; margin-bottom:var(--s4); display:none; }
+    .eng-char-count { font-size:0.68rem; color:#a09189; text-align:left; }
 
     /* Required label */
-    .eng-required-label {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 0.3rem;
-    }
-    .eng-required-tag {
-      font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase;
-      color: var(--accent); background: rgba(184,159,143,0.12);
-      padding: 0.15rem 0.5rem; border-radius: 2px;
-    }
+    .eng-required-label { display:flex; align-items:center; justify-content:space-between; margin-bottom:0.3rem; }
+    .eng-required-tag { font-size:0.6rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); background:rgba(184,159,143,0.12); padding:0.15rem 0.5rem; border-radius:2px; }
 
-    /* Text input */
-    .eng-text-input {
-      width: 100%; padding: 0.55rem 0;
-      border: none; border-bottom: 2px solid var(--border);
-      border-radius: 0; background: transparent;
-      font-family: var(--sans); font-size: 0.92rem;
-      direction: rtl; color: var(--text);
-      transition: border-color 0.2s; margin-bottom: 0.3rem;
-    }
-    .eng-text-input::placeholder { color: #7A7068; }
-    .eng-text-input:focus { outline: none; border-bottom-color: var(--olive); }
-    .eng-text-input.error { border-bottom-color: #C0392B; }
-    @keyframes shake {
-      0%,100%{transform:translateX(0)} 20%{transform:translateX(-5px)} 60%{transform:translateX(5px)}
-    }
-    .eng-text-input.shake { animation: shake 0.35s ease; }
-    .eng-error-msg {
-      font-size: 0.68rem; color: #C0392B; margin-bottom: var(--s4);
-      display: none;
-    }
-    .eng-char-count {
-      font-size: 0.68rem; color: #2A2520;
-      text-align: left; margin-bottom: var(--s6);
-    }
+    /* Quantity stepper (multi-names) */
+    .eng-names-qty-row { display:flex; align-items:center; gap:var(--s4); margin-bottom:var(--s6); }
+    .eng-qty-label { font-size:0.72rem; letter-spacing:0.08em; color:var(--text); }
+    .eng-qty-stepper { display:flex; align-items:center; border:1px solid #e8ddd5; border-radius:2px; overflow:hidden; }
+    .eng-qty-btn { width:28px; height:28px; background:none; border:none; cursor:pointer; font-size:1rem; color:#bfa37e; display:flex; align-items:center; justify-content:center; transition:background 0.15s; }
+    .eng-qty-btn:hover { background:rgba(191,163,126,0.12); }
+    .eng-qty-val { padding:0 0.7rem; font-size:0.85rem; color:var(--text); min-width:2rem; text-align:center; border-left:1px solid #e8ddd5; border-right:1px solid #e8ddd5; line-height:28px; }
 
-    /* Image upload */
-    .eng-img-upload {
-      border: 1px solid var(--border); padding: 2rem;
-      text-align: center; cursor: pointer; margin-bottom: var(--s6);
-      transition: border-color 0.2s;
-    }
-    .eng-img-upload:hover { border-color: var(--accent); }
-    .eng-img-upload input { display: none; }
-    .eng-img-upload-label { font-size: 0.78rem; color: #2A2520; line-height: 1.9; }
-    .eng-img-preview { max-width: 100%; max-height: 140px; display: none; margin: 0 auto; }
+    /* Image upload (backward compat) */
+    .eng-img-upload { border:1px solid var(--border); padding:2rem; text-align:center; cursor:pointer; margin-bottom:var(--s6); transition:border-color 0.2s; }
+    .eng-img-upload:hover { border-color:var(--accent); }
+    .eng-img-upload input { display:none; }
+    .eng-img-upload-label { font-size:0.78rem; color:#2A2520; line-height:1.9; }
+    .eng-img-preview { max-width:100%; max-height:140px; display:none; margin:0 auto; }
 
-    /* Multi-names */
-    .names-list { display: flex; flex-direction: column; gap: var(--s4); margin-bottom: var(--s4); }
-    .name-input-row { display: flex; align-items: center; gap: var(--s6); }
-    .name-input-row label {
-      font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--olive); white-space: nowrap; min-width: 50px;
-    }
-    .name-input-row input {
-      flex: 1; padding: 0.4rem 0;
-      border: none; border-bottom: 2px solid var(--border);
-      background: transparent; font-size: 0.88rem;
-      direction: rtl; color: var(--text);
-      transition: border-color 0.2s;
-    }
-    .name-input-row input::placeholder { color: #7A7068; }
-    .name-input-row input:focus { outline: none; border-bottom-color: var(--olive); }
-    .add-name-btn {
-      font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
-      color: var(--olive); cursor: pointer;
-      background: none; border: none; padding: 0;
-      margin-bottom: var(--s6); transition: opacity 0.2s;
-    }
-    .add-name-btn:hover { opacity: 0.7; }
+    /* Type row (text/image toggle) */
+    .eng-type-row { display:flex; gap:var(--s6); margin-bottom:var(--s6); }
+    .eng-type-btn { font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase; color:#2A2520; background:none; border:none; padding:0; padding-bottom:2px; border-bottom:1px solid transparent; cursor:pointer; transition:color 0.2s, border-color 0.2s; }
+    .eng-type-btn.active { color:#bfa37e; border-bottom-color:#bfa37e; font-weight:500; }
 
     /* Price breakdown */
-    .price-summary { margin-top: var(--s2); }
-    .price-row {
-      display: flex; justify-content: space-between;
-      font-size: 0.78rem; padding: 0.15rem 0;
-      color: var(--text); opacity: 0.7;
-    }
-    .price-row.total {
-      opacity: 1; font-size: 0.85rem;
-      padding-top: var(--s3); margin-top: var(--s2);
-      border-top: 1px solid var(--border);
-    }
+    .price-summary { margin-top:var(--s2); }
+    .price-row { display:flex; justify-content:space-between; font-size:0.78rem; padding:0.15rem 0; color:var(--text); opacity:0.7; }
+    .price-row.total { opacity:1; font-size:0.85rem; padding-top:var(--s3); margin-top:var(--s2); border-top:1px solid var(--border); }
 
-    /* Not found */
-    .not-found { text-align: center; padding: 6rem 2rem; color: var(--text); opacity: 0.5; }
-    .not-found h2 { font-family: var(--serif); font-weight: 300; font-size: 1.5rem; margin-bottom: 1rem; }
-
-    /* Loading */
-    .product-loading { min-height: 60vh; display: flex; align-items: center; justify-content: center; }
-    .product-loading .spinner {
-      width: 32px; height: 32px;
-      border: 1px solid var(--border); border-top-color: var(--olive);
-      border-radius: 50%; animation: spin 0.9s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    /* Not found / Loading */
+    .not-found { text-align:center; padding:6rem 2rem; color:var(--text); opacity:0.5; }
+    .not-found h2 { font-family:var(--serif); font-weight:300; font-size:1.5rem; margin-bottom:1rem; }
+    .product-loading { min-height:60vh; display:flex; align-items:center; justify-content:center; }
+    .product-loading .spinner { width:32px; height:32px; border:1px solid var(--border); border-top-color:var(--olive); border-radius:50%; animation:spin 0.9s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -281,9 +227,23 @@ let basePrice = 0;
 
 // Engraving state
 const state = {
-  front: { type: null, text: '', font: null, imageFile: null },
-  back:  { enabled: false, type: null, text: '', imageFile: null },
-  names: []   // [{ text }]
+  front: { type: 'text', lang: 'he', text: '', font: null, imageFile: null },
+  back:  { enabled: false, type: 'text', lang: 'he', text: '', font: null, imageFile: null },
+  names: [],
+  nameCount: 0
+};
+
+const FONTS = {
+  he: [
+    { key: 'Assistant',    label: 'Assistant',    tag: 'נקי',    sample: 'שלום' },
+    { key: 'Rubik',        label: 'Rubik',        tag: 'מודרני', sample: 'שלום' },
+    { key: 'Varela Round', label: 'Varela Round', tag: 'רך',     sample: 'שלום' }
+  ],
+  en: [
+    { key: 'Playfair Display', label: 'Playfair Display', tag: 'Luxury',      sample: 'Hello' },
+    { key: 'Montserrat',       label: 'Montserrat',       tag: 'Modern',      sample: 'Hello' },
+    { key: 'Dancing Script',   label: 'Dancing Script',   tag: 'Handwritten', sample: 'Hello' }
+  ]
 };
 
 // ══════════════════════════════════════════════════════════
@@ -446,14 +406,13 @@ function renderProduct() {
 }
 
 // ══════════════════════════════════════════════════════════
-// BUILD ENGRAVING UI HTML  —  Inline Flow
+// BUILD ENGRAVING UI HTML  —  Tab Flow
 // ══════════════════════════════════════════════════════════
 function buildEngravingUI(front, back, multiNames) {
   const hasFront      = front.types && front.types.length > 0;
   const hasBack       = back.enabled;
   const hasMultiNames = multiNames.enabled;
-
-  if (!hasFront && !hasBack && !hasMultiNames) return '';
+  if (!hasFront && !hasMultiNames) return '';
 
   const priceNote = front.price_addition > 0
     ? `+ ${front.price_addition} ₪ לחריטה`
@@ -465,78 +424,104 @@ function buildEngravingUI(front, back, multiNames) {
       <span class="eng-price-note">${priceNote}</span>
     </div>`;
 
-  // ── Front panel (always visible) ──
-  html += `<div id="panel-front">`;
-  html += buildSidePanel('front', front);
-  html += `</div>`;
-
-  // ── Back side — toggle checkbox + collapsible panel ──
-  if (hasBack) {
-    html += `<div class="eng-back-toggle-row">
-      <label class="eng-back-toggle-label">
-        <input type="checkbox" id="back-toggle" onchange="toggleBackPanel(this.checked)">
-        <span class="eng-back-toggle-text">חריטה בצד השני?${back.price_addition > 0 ? ` <span class="eng-price-note"> +${back.price_addition} ₪</span>` : ''}</span>
-      </label>
-    </div>
-    <div id="panel-back" style="display:none">`;
-    html += buildSidePanel('back', back);
-    html += `</div>`;
-  }
-
-  // ── Multi-names panel ──
   if (hasMultiNames) {
-    html += `<div id="panel-names" style="padding-top:var(--s8);border-top:1px solid var(--border)">
-      <div class="eng-section-head" style="margin-bottom:var(--s6)">
-        <span class="section-label" style="margin-bottom:0">${multiNames.slot_label || 'שמות'} לחריטה</span>
-        ${multiNames.price_per_name > 0
-          ? `<span class="eng-price-note">+ ${multiNames.price_per_name} ₪ לכל שם</span>`
-          : ''}
+    const max       = multiNames.max_names  || 5;
+    const slotLabel = multiNames.slot_label || 'שם';
+    html += `
+      <div class="eng-names-qty-row">
+        <span class="eng-qty-label">כמות ${slotLabel}ות:</span>
+        <div class="eng-qty-stepper">
+          <button class="eng-qty-btn" onclick="changeNameCount(-1)" type="button">−</button>
+          <span class="eng-qty-val" id="name-count-display">1</span>
+          <button class="eng-qty-btn" onclick="changeNameCount(1)" type="button">+</button>
+        </div>
+        ${multiNames.price_per_name > 0 ? `<span class="eng-price-note">+ ${multiNames.price_per_name} ₪ לכל ${slotLabel}</span>` : ''}
       </div>
-      <div class="names-list" id="names-list"></div>
-      <button class="add-name-btn" id="add-name-btn" onclick="addNameSlot()">
-        + הוסף ${multiNames.slot_label || 'שם'}
-      </button>
-    </div>`;
+      <div class="eng-tab-bar" id="names-tab-bar">
+        <button class="eng-tab active" data-tab="name-0" onclick="switchTab('names','name-0',this)" type="button">${slotLabel} 1</button>
+      </div>
+      <div id="names-panels">
+        <div class="eng-tab-panel active" id="panel-name-0">${buildSidePanel('name-0', front)}</div>
+      </div>
+      <input type="hidden" id="names-max" value="${max}">
+      <input type="hidden" id="names-slot-label" value="${slotLabel}">
+      <input type="hidden" id="names-price-per" value="${multiNames.price_per_name || 0}">`;
+  } else {
+    html += `
+      <div class="eng-tab-bar" id="sides-tab-bar">
+        <button class="eng-tab active" data-tab="front" onclick="switchTab('sides','front',this)" type="button">צד 1</button>
+        ${hasBack ? `<button class="eng-tab" data-tab="back" id="tab-back" style="display:none" onclick="switchTab('sides','back',this)" type="button">צד 2</button>` : ''}
+      </div>
+      <div id="sides-panels">
+        <div class="eng-tab-panel active" id="panel-front">${buildSidePanel('front', front)}</div>
+        ${hasBack ? `<div class="eng-tab-panel" id="panel-back">${buildSidePanel('back', back)}</div>` : ''}
+      </div>`;
+    if (hasBack) html += `
+      <div class="eng-back-toggle-row">
+        <label class="eng-back-toggle-label">
+          <input type="checkbox" id="back-toggle" onchange="toggleBackPanel(this.checked)">
+          <span class="eng-back-toggle-text">הוסף חריטה בצד השני?${back.price_addition > 0 ? ` <span class="eng-price-note"> +${back.price_addition} ₪</span>` : ''}</span>
+        </label>
+      </div>`;
   }
 
   html += `</div>`;
   return html;
 }
 
+function buildFontOptions(side, lang) {
+  return FONTS[lang].map((f, i) => `
+    <button class="eng-font-opt${i===0?' active':''}" data-font="${f.key}"
+            onclick="setFont('${side}',this)" type="button">
+      <span class="font-opt-sample" style="font-family:'${f.key}'">${f.sample}</span>
+      <span class="font-opt-name">${f.label}</span>
+      <span class="font-opt-tag">${f.tag}</span>
+    </button>`).join('');
+}
+
 function buildSidePanel(side, cfg) {
-  const types    = cfg.types || [];
-  const hasText  = types.includes('text');
+  const types    = cfg.types || ['text'];
+  const hasText  = types.includes('text') || types.length === 0;
   const hasImage = types.includes('image');
+  const maxChars = cfg.max_chars || 20;
   let html = '';
 
-  // Type selector — only when both options exist
   if (hasText && hasImage) {
     html += `<div class="eng-type-row">
-      <button class="eng-type-btn active" id="type-text-${side}" onclick="setType('${side}','text')">טקסט</button>
-      <button class="eng-type-btn"        id="type-img-${side}"  onclick="setType('${side}','image')">תמונה</button>
+      <button class="eng-type-btn active" id="type-text-${side}" onclick="setType('${side}','text')" type="button">טקסט</button>
+      <button class="eng-type-btn" id="type-img-${side}" onclick="setType('${side}','image')" type="button">תמונה</button>
     </div>`;
   }
 
-  // Text fields
-  html += `<div id="text-fields-${side}" ${hasText ? '' : 'style="display:none"'}>
-    ${(cfg.fonts && cfg.fonts.length > 1) ? `
-    <div class="eng-font-label">סגנון גופן</div>
-    <div class="font-selector" id="fonts-${side}">
-      ${cfg.fonts.map(f => `<button class="font-opt" data-font="${f}" onclick="setFont('${side}',this)">${f === 'Hebrew' ? 'עברית רגילה' : f}</button>`).join('')}
-    </div>` : ''}
-    <div class="eng-required-label">
-      <span style="font-size:0.68rem;color:#2A2520">טקסט לחריטה</span>
-      <span class="eng-required-tag">* חובה</span>
-    </div>
-    <input class="eng-text-input" id="text-${side}" type="text" maxlength="${cfg.max_chars||20}"
-           placeholder="הכנס את הטקסט שיחרט על התכשיט..." oninput="onTextInput('${side}',this)">
-    <div class="eng-error-msg" id="error-${side}">נא להזין טקסט לחריטה לפני ההוספה לסל</div>
-    <div class="eng-char-count"><span id="chars-${side}">0</span> / ${cfg.max_chars||20} תווים</div>
-  </div>`;
+  if (hasText) {
+    html += `<div id="text-fields-${side}">
+      <div class="eng-step">
+        <div class="eng-step-label"><span class="eng-step-num">1</span>בחר שפה</div>
+        <div class="eng-lang-btns">
+          <button class="eng-lang-btn active" data-lang="he" onclick="setLang('${side}',this)" type="button">עברית</button>
+          <button class="eng-lang-btn" data-lang="en" onclick="setLang('${side}',this)" type="button">English</button>
+        </div>
+      </div>
+      <div class="eng-step">
+        <div class="eng-step-label"><span class="eng-step-num">2</span>בחר גופן</div>
+        <div class="eng-font-opts" id="font-opts-${side}">${buildFontOptions(side, 'he')}</div>
+      </div>
+      <div class="eng-step">
+        <div class="eng-required-label">
+          <span style="font-size:0.68rem;color:#2A2520">טקסט לחריטה</span>
+          <span class="eng-required-tag">* חובה</span>
+        </div>
+        <input class="eng-text-input" id="text-${side}" type="text" maxlength="${maxChars}"
+               placeholder="הכנס את הטקסט שיחרט על התכשיט..."
+               oninput="onTextInput('${side}',this)" dir="rtl">
+        <div class="eng-error-msg" id="error-${side}">נא להזין טקסט לחריטה לפני ההוספה לסל</div>
+        <div class="eng-char-count"><span id="chars-${side}">0</span> / ${maxChars} תווים</div>
+      </div>
+    </div>`;
+  }
 
-  // Image upload fields
   if (hasImage) {
-    html += `<div id="img-fields-${side}" style="display:none">
+    html += `<div id="img-fields-${side}" style="display:${hasText?'none':'block'}">
       <div class="eng-img-upload" onclick="document.getElementById('img-input-${side}').click()">
         <input type="file" id="img-input-${side}" accept="image/*" onchange="onImageSelect('${side}',this)">
         <img class="eng-img-preview" id="img-preview-${side}" src="" alt="">
@@ -554,70 +539,118 @@ function buildSidePanel(side, cfg) {
 // ATTACH EVENTS & INIT DEFAULT STATE
 // ══════════════════════════════════════════════════════════
 function attachEngravingEvents(front, back, multiNames) {
-  const es = product.engraving_settings || {};
-  const f  = es.front || front;
-
-  // Set initial type for front
-  if (f.types && f.types.length > 0) {
-    setType('front', f.types[0]);
+  if (multiNames.enabled) {
+    state.names     = [{ lang: 'he', text: '', font: 'Assistant' }];
+    state.nameCount = 1;
+    const firstFont = document.querySelector('#panel-name-0 .eng-font-opt');
+    if (firstFont) setFont('name-0', firstFont);
+  } else {
+    state.front.lang = 'he';
+    const firstFrontFont = document.querySelector('#panel-front .eng-font-opt');
+    if (firstFrontFont) setFont('front', firstFrontFont);
   }
-  // Auto-select first font — front
-  const firstFrontFont = document.querySelector('#fonts-front .font-opt');
-  if (firstFrontFont) setFont('front', firstFrontFont);
-
-  // Set initial type for back
-  if (back.enabled && back.types && back.types.length > 0) {
-    setType('back', back.types[0]);
-  }
-  // Auto-select first font — back
-  const firstBackFont = document.querySelector('#fonts-back .font-opt');
-  if (firstBackFont) setFont('back', firstBackFont);
-
-  // Init multi-names with 1 slot
-  if (multiNames.enabled) addNameSlot();
 }
 
 // ══════════════════════════════════════════════════════════
 // ENGRAVING INTERACTIONS
 // ══════════════════════════════════════════════════════════
 
-function toggleBackPanel(show) {
-  document.getElementById('panel-back').style.display = show ? 'block' : 'none';
-  if (!show) {
-    state.back.text = '';
-    state.back.imageFile = null;
-    const textEl = document.getElementById('text-back');
-    if (textEl) { textEl.value = ''; }
-    const charEl = document.getElementById('chars-back');
-    if (charEl) charEl.textContent = '0';
+function switchTab(group, tabId, btn) {
+  const tabBar = document.getElementById(`${group}-tab-bar`);
+  if (!tabBar) return;
+  tabBar.querySelectorAll('.eng-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  tabBar.querySelectorAll('.eng-tab').forEach(t => {
+    const panel = document.getElementById(`panel-${t.dataset.tab}`);
+    if (panel) panel.classList.toggle('active', t.dataset.tab === tabId);
+  });
+}
+
+function setLang(side, btn) {
+  const lang = btn.dataset.lang;
+  btn.closest('.eng-lang-btns').querySelectorAll('.eng-lang-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (side.startsWith('name-')) {
+    const idx = parseInt(side.split('-')[1]);
+    if (state.names[idx]) state.names[idx].lang = lang;
+  } else {
+    state[side].lang = lang;
   }
-  updatePriceSummary();
+  const fontOpts = document.getElementById(`font-opts-${side}`);
+  if (fontOpts) {
+    fontOpts.innerHTML = buildFontOptions(side, lang);
+    const firstFont = fontOpts.querySelector('.eng-font-opt');
+    if (firstFont) setFont(side, firstFont);
+  }
+  const input = document.getElementById(`text-${side}`);
+  if (input) {
+    input.dir = lang === 'he' ? 'rtl' : 'ltr';
+    input.placeholder = lang === 'he'
+      ? 'הכנס את הטקסט שיחרט על התכשיט...'
+      : 'Enter text to be engraved...';
+  }
+}
+
+function setFont(side, btn) {
+  btn.closest('.eng-font-opts').querySelectorAll('.eng-font-opt').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const font = btn.dataset.font;
+  if (side.startsWith('name-')) {
+    const idx = parseInt(side.split('-')[1]);
+    if (state.names[idx]) state.names[idx].font = font;
+  } else {
+    state[side].font = font;
+  }
+  const input = document.getElementById(`text-${side}`);
+  if (input) {
+    input.style.fontFamily = `'${font}', sans-serif`;
+    input.style.fontSize = '1.1rem';
+  }
 }
 
 function setType(side, type) {
   state[side].type = type;
   const isText = type === 'text';
-
   document.getElementById(`type-text-${side}`)?.classList.toggle('active', isText);
   document.getElementById(`type-img-${side}`)?.classList.toggle('active', !isText);
-  document.getElementById(`text-fields-${side}`).style.display = isText  ? 'block' : 'none';
+  document.getElementById(`text-fields-${side}`).style.display = isText ? 'block' : 'none';
   const imgFields = document.getElementById(`img-fields-${side}`);
   if (imgFields) imgFields.style.display = !isText ? 'block' : 'none';
-
   updatePriceSummary();
 }
 
-function setFont(side, el) {
-  document.querySelectorAll(`#fonts-${side} .font-opt`).forEach(f => f.classList.remove('active'));
-  el.classList.add('active');
-  state[side].font = el.dataset.font;
+function toggleBackPanel(show) {
+  const tabBack = document.getElementById('tab-back');
+  if (show) {
+    if (tabBack) tabBack.style.display = '';
+    switchTab('sides', 'back', tabBack);
+    if (!state.back.font) {
+      const firstFont = document.querySelector('#panel-back .eng-font-opt');
+      if (firstFont) setFont('back', firstFont);
+    }
+  } else {
+    if (tabBack) tabBack.style.display = 'none';
+    const tabFront = document.querySelector('#sides-tab-bar [data-tab="front"]');
+    if (tabFront) switchTab('sides', 'front', tabFront);
+    state.back.text = ''; state.back.font = null;
+    const textEl = document.getElementById('text-back');
+    if (textEl) { textEl.value = ''; textEl.style.fontFamily = ''; }
+    const charEl = document.getElementById('chars-back');
+    if (charEl) charEl.textContent = '0';
+  }
+  state.back.enabled = show;
+  updatePriceSummary();
 }
 
 function onTextInput(side, el) {
-  state[side].text = el.value;
+  if (side.startsWith('name-')) {
+    const idx = parseInt(side.split('-')[1]);
+    if (state.names[idx]) state.names[idx].text = el.value;
+  } else {
+    state[side].text = el.value;
+  }
   const countEl = document.getElementById(`chars-${side}`);
   if (countEl) countEl.textContent = el.value.length;
-  // Clear error state once user starts typing
   if (el.value.trim()) {
     el.classList.remove('error');
     const errMsg = document.getElementById(`error-${side}`);
@@ -641,29 +674,50 @@ function onImageSelect(side, input) {
   updatePriceSummary();
 }
 
-// ── Multi-names ─────────────────────────────────────────
-const multiNames_cfg = () => (product.engraving_settings?.multi_names || {});
+function changeNameCount(delta) {
+  const max       = parseInt(document.getElementById('names-max')?.value  || '5');
+  const slotLabel = document.getElementById('names-slot-label')?.value    || 'שם';
+  const front     = product.engraving_settings?.front                     || {};
+  const newCount  = Math.max(1, Math.min(max, state.nameCount + delta));
+  if (newCount === state.nameCount) return;
 
-function addNameSlot() {
-  const cfg     = multiNames_cfg();
-  const max     = cfg.max_names || 5;
-  if (state.names.length >= max) return;
+  const tabBar          = document.getElementById('names-tab-bar');
+  const panelsContainer = document.getElementById('names-panels');
 
-  const idx = state.names.length;
-  state.names.push({ text: '' });
+  if (newCount > state.nameCount) {
+    for (let i = state.nameCount; i < newCount; i++) {
+      state.names.push({ lang: 'he', text: '', font: 'Assistant' });
+      const tab = document.createElement('button');
+      tab.className     = 'eng-tab';
+      tab.dataset.tab   = `name-${i}`;
+      tab.textContent   = `${slotLabel} ${i + 1}`;
+      tab.type          = 'button';
+      tab.onclick       = (function(idx) {
+        return function() { switchTab('names', `name-${idx}`, this); };
+      })(i);
+      tabBar.appendChild(tab);
+      const panel       = document.createElement('div');
+      panel.className   = 'eng-tab-panel';
+      panel.id          = `panel-name-${i}`;
+      panel.innerHTML   = buildSidePanel(`name-${i}`, front);
+      panelsContainer.appendChild(panel);
+      const firstFont   = panel.querySelector('.eng-font-opt');
+      if (firstFont) setFont(`name-${i}`, firstFont);
+    }
+  } else {
+    for (let i = state.nameCount - 1; i >= newCount; i--) {
+      state.names.pop();
+      tabBar.querySelector(`[data-tab="name-${i}"]`)?.remove();
+      document.getElementById(`panel-name-${i}`)?.remove();
+    }
+    if (!tabBar.querySelector('.eng-tab.active')) {
+      const lastTab = tabBar.querySelector('.eng-tab:last-child');
+      if (lastTab) lastTab.click();
+    }
+  }
 
-  const li = document.createElement('div');
-  li.className = 'name-input-row';
-  li.innerHTML = `
-    <label>${cfg.slot_label || 'שם'} ${idx + 1}</label>
-    <input type="text" placeholder="הכנס ${cfg.slot_label || 'שם'}..."
-           oninput="state.names[${idx}].text=this.value;updatePriceSummary()">`;
-  document.getElementById('names-list').appendChild(li);
-
-  // Hide add button if max reached
-  if (state.names.length >= max)
-    document.getElementById('add-name-btn').style.display = 'none';
-
+  state.nameCount = newCount;
+  document.getElementById('name-count-display').textContent = newCount;
   updatePriceSummary();
 }
 
@@ -752,20 +806,27 @@ function addToCart() {
   const es         = product.engraving_settings || {};
   const multiNames = es.multi_names || {};
 
-  // ── Validation: require engraving text if product is engravable ──
+  // ── Validation ──
   if (product.is_engravable) {
-    const frontCfg = es.front || {};
-    const hasFrontText = frontCfg.types && frontCfg.types.includes('text');
-    if (hasFrontText && !state.front.text.trim()) {
-      const input = document.getElementById('text-front');
-      const errMsg = document.getElementById('error-front');
-      if (input) {
-        input.classList.add('error', 'shake');
-        input.focus();
-        setTimeout(() => input.classList.remove('shake'), 400);
+    const frontCfg   = es.front || {};
+    const multiNamesCfg = es.multi_names || {};
+    if (multiNamesCfg.enabled) {
+      if (!state.names.some(n => n.text.trim())) {
+        const input  = document.getElementById('text-name-0');
+        const errMsg = document.getElementById('error-name-0');
+        if (input) { input.classList.add('error','shake'); input.focus(); setTimeout(()=>input.classList.remove('shake'),400); }
+        if (errMsg) errMsg.style.display = 'block';
+        return;
       }
-      if (errMsg) errMsg.style.display = 'block';
-      return; // stop — don't add to cart
+    } else {
+      const hasFrontText = frontCfg.types && frontCfg.types.includes('text');
+      if (hasFrontText && !state.front.text.trim()) {
+        const input  = document.getElementById('text-front');
+        const errMsg = document.getElementById('error-front');
+        if (input) { input.classList.add('error','shake'); input.focus(); setTimeout(()=>input.classList.remove('shake'),400); }
+        if (errMsg) errMsg.style.display = 'block';
+        return;
+      }
     }
   }
 
@@ -779,10 +840,13 @@ function addToCart() {
     price:    total,
     image:    product.image_url,
     engraving: product.is_engravable ? {
-      front_text:  state.front.text  || null,
-      front_font:  state.front.font  || null,
-      back_text:   state.back.text   || null,
-      names:       multiNames.enabled ? state.names.map(n => n.text).filter(Boolean) : null
+      front_text:  state.front.text || null,
+      front_font:  state.front.font || null,
+      front_lang:  state.front.lang || null,
+      back_text:   state.back.text  || null,
+      back_font:   state.back.font  || null,
+      back_lang:   state.back.lang  || null,
+      names:       multiNames.enabled ? state.names.filter(n=>n.text).map(n=>({text:n.text,font:n.font,lang:n.lang})) : null
     } : null
   });
   localStorage.setItem('olives_cart', JSON.stringify(cart));
